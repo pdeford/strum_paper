@@ -1,0 +1,1 @@
+# strum_paper
