@@ -11,6 +11,8 @@ import numpy as np
 import string
 import sys
 
+np.random.seed(1241)
+
 ######################################################################
 # Load the data from all of the outputs                              #
 ######################################################################
