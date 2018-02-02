@@ -11,6 +11,7 @@ n_process=$1
 # Prepare the environment
 source activate strum
 mkdir data figures output
+touch output/correlations.txt
 
 ###########################
 # Download necessary data #
@@ -86,20 +87,20 @@ done
 # Find the correlation between scores assigned by each model #
 ##############################################################
 
-# Loop over each of the ChIP files
-ls data/*K562*bed | while read line;
-do
-	# Extract TF name and accession
-	fname=${line##*/}
-	tf=${fname%%.*}
-	suffix=${fname##*.K562.}
-	accession=${suffix%.*}
+# # Loop over each of the ChIP files
+# ls data/*K562*bed | while read line;
+# do
+# 	# Extract TF name and accession
+# 	fname=${line##*/}
+# 	tf=${fname%%.*}
+# 	suffix=${fname##*.K562.}
+# 	accession=${suffix%.*}
 
-	basename=$tf'.'$accession
+# 	basename=$tf'.'$accession
 
-	echo "Get correlation between motif scores"
-	./scripts/correlation.py $basename >> output/correlations.txt
-done;
+# 	echo "Get correlation between motif scores"
+# 	./scripts/correlation.py $basename >> output/correlations.txt
+# done;
 
 ####################################################################
 # Analyze performance on cell type specific predicitons with DNase #
