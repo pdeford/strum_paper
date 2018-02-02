@@ -8,7 +8,7 @@ import random
 import sys
 from sklearn.metrics import roc_curve, roc_auc_score
 
-import StruM
+from strum import strum
 import bx.bbi.bigwig_file
 
 
