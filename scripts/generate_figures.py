@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""
+BIG TO DO ITEM: AUTOMATE THE ADDITION OF LINES MARKING THE SIGNIFICANCE
+OF INCREASES IN AUCS TO RELEVANT PLOTS
+"""
+
 import matplotlib as mpl
 
 mpl.use("Agg")
