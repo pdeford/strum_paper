@@ -133,8 +133,11 @@ do
 	fname=${line##*/}
 	name=${fname%%.*}
 	tf=${name%%_*}
+	# Don't print any newline characters, just put a tab after 
+	##each thing that is read from the file.
 	echo -n $tf$'\t'
 	awk '{printf "%s\t",substr($NF,2,4)}' 'output/'$tf'_AUCs.txt'
+	# Now add the newline.
 	echo
 done > output/dnase_consolidated.txt
 
@@ -146,4 +149,5 @@ python scripts/generate_figures.py \
 	output/chip_auc.txt \
 	output/correlations.txt \
 	output/dnase_consolidated.txt \
-	output/position_comp.txt
+	output/position_comp.txt \
+	output/coefficents.txt
