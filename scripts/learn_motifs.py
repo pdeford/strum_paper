@@ -54,7 +54,7 @@ def learn(basename, n_process, random_seed):
 	em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
 		k=(k-1), max_iter=250, random_seed=random_seed)
 
-	return pwm, dwm, ml_strum, em_strum
+	return (pwm, dwm, ml_strum, em_strum), sequences
 
 def learn_pwm(sequences):
 	"""Generate a PWM from a set of training sequences."""
@@ -119,5 +119,5 @@ if __name__ == '__main__':
 	basename = sys.argv[1]
 	n_process = int(sys.argv[2])
 	random_seed = int(sys.argv[3])
-	models = learn(basename, n_process, random_seed)
+	models, sequences = learn(basename, n_process, random_seed)
 	pickle.dump(models, open(sys.argv[4], 'wb'))

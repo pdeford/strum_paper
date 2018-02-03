@@ -22,7 +22,7 @@ except:
 
 from strum import strum
 
-def score_all(basename, n_process, random_seed, models):
+def score_all(basename, n_process, random_seed, models, sequences):
 	global k, pwm, dwm, ml_strum, em_strum
 
 	random.seed(random_seed)
