@@ -83,6 +83,27 @@ def learn_dwm(sequences):
 	DWM[:, 1:] /= (len(sequences) + 16.)
 	return DWM
 
+def fasta_reader(file_obj):
+	"""Read a FASTA file and return the sequences in a list."""
+	sequences = []
+	currSeq = ""
+	firstLine = True
+	for line in file_obj:
+		if line.startswith(">") or line.strip() == "":
+			if firstLine:
+				firstLine = False
+			else:
+				sequences.append(currSeq.upper())
+				currSeq = ""
+		else:
+			s = line.strip()
+			currSeq += s
+		if line == "":
+			break
+	if currSeq != "":
+		sequences.append(currSeq.upper())
+	return sequences
+
 def learn_strum(sequences):
 	"""Generate a StruM from a set of training sequences."""
 	"""StruM = Structural Motif"""
