@@ -22,6 +22,14 @@ except:
 
 from strum import strum
 
+
+# Set up indexes for defining the weight matrices
+nucs = "ACGT"
+nuc_index = dict(zip(nucs, range(4)))
+dimers = [a+b for a in nucs for b in nucs]
+di_index = dict(zip(dimers, range(16)))
+N_seq = 500
+
 def score_all(basename, n_process, random_seed, models, sequences):
 	global k, pwm, dwm, ml_strum, em_strum
 
@@ -29,7 +37,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 	pwm, dwm, ml_strum, em_strum = models
 	k = pwm.shape[1]
-
+	N_seq = 500
 	print >> sys.stderr, "Load positive and negative sequences"
 	# Get positive examples from file
 	peaks = sequences[N_seq:]
