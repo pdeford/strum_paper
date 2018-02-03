@@ -18,6 +18,9 @@ import sys
 
 np.random.seed(1241)
 
+# from Bio import motifs as biomotifs
+# from strum import strum
+
 ######################################################################
 # Load the data from all of the outputs                              #
 ######################################################################
@@ -181,12 +184,44 @@ plt.savefig('figures/figure1.pdf')
 # Figure 2: Example motif graphics
 ######################################################################
 
-plt.figure(figsize=[onecol, 2*onecol])
-ax_a = plt.subplot(2,1,1)
+## Read example data and construct logos for PWM and StruM for FOXA1
+# motif = strum.StruM(mode='proteingroove')
+#
+# head, seq = motif.read_FASTA(open("data/MA0148.1.sites"))
+# seq = [x.strip(string.ascii_lowercase).replace("X", "N") for x in seq]
+#
+# motif.train(seq, fasta=False)
+#
+# motif.PWM *= 100
+# pwm = biomotifs.read(motif.print_PWM().split('\n'), 'pfm')
+# pwm.weblogo(
+# 	"output/FOXA1_PWM.png", show_errorbars=False, 
+#	color_scheme='color_classic', format='png_print')
+#
+# motif.plot("output/FOXA1_StruM.png")
 
-ax_b = plt.subplot(2,1,2)
+fig2, (ax_a, ax_b) = plt.subplots(2, 1, gridspec_kw = {'height_ratios':[1, 2]}, 
+						   figsize=[onecol, 2*onecol])
 
-plt.savefig('figures/figure2.pdf')
+pwm_img = mpl.image.imread("output/FOXA1_PWM.png")
+strum_img = mpl.image.imread("output/FOXA1_StruM.png")
+ax_a.imshow(pwm_img)
+plt.xticks([])
+plt.yticks([])
+ax_b.imshow(strum_img)
+plt.xticks([])
+plt.yticks([])
+ax_a.spines["top"].set_visible(False)
+ax_a.spines["right"].set_visible(False)
+ax_a.spines["bottom"].set_visible(False)
+ax_a.spines["left"].set_visible(False)
+ax_b.spines["top"].set_visible(False)
+ax_b.spines["right"].set_visible(False)
+ax_b.spines["bottom"].set_visible(False)
+ax_b.spines["left"].set_visible(False)
+
+plt.subplots_adjust(left=0.01, bottom=0.05, right=0.99, top=0.95, hspace=0.2)
+plt.savefig('figures/figure2.pdf', dpi=600)
 
 ######################################################################
 # Figure 3: StruMs outperform, but are complementary to, PWMs        #

@@ -36,6 +36,10 @@ curl -o "data/DNase.K562."$dnase_accession".bw" \
 	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
 echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
 
+# Download FOXA1 binding information from JASPAR
+# Example for figures
+curl -o http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
 # and compare the performance of PWM to StruM               #
