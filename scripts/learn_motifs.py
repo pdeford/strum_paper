@@ -86,9 +86,9 @@ def learn_dwm(sequences):
 def learn_strum(sequences):
 	"""Generate a StruM from a set of training sequences."""
 	"""StruM = Structural Motif"""
-	strum = fast_strum.FastStruM(mode='groove')
-	strum.train(sequences, lim=0.001)
-	return strum
+	motif = strum.StruM(mode='groove')
+	motif.train(sequences, lim=0.001)
+	return motif
 
 if __name__ == '__main__':
 	if len(sys.argv) < 5:
