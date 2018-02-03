@@ -17,24 +17,24 @@ touch output/correlations.txt
 # Download necessary data #
 ###########################
 
-# Download reference genome
-rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
-tar xvzf data/chromFa.tar.gz -C ./data
-cat data/chr*.fa > data/hg19.fa
-#rm data/chr*.fa
+## Download reference genome
+#rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
+#tar xvzf data/chromFa.tar.gz -C ./data
+#cat data/chr*.fa > data/hg19.fa
+##rm data/chr*.fa
 
-# Download ChIP data for K562 cells
-python scripts/download_K562chip.py > data/accessions.txt
-# Download additional ChIP data for cell type specific predictions
-python scripts/download_OTHERchip.py >> data/accessions.txt
+## Download ChIP data for K562 cells
+#python scripts/download_K562chip.py > data/accessions.txt
+## Download additional ChIP data for cell type specific predictions
+#python scripts/download_OTHERchip.py >> data/accessions.txt
 
 gunzip data/*gz
 
-# Download DNase data for K562 cells
-dnase_accession="ENCFF111KJD"
-curl -o "data/DNase.K562."$dnase_accession".bw" \
-	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
-echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
+## Download DNase data for K562 cells
+#dnase_accession="ENCFF111KJD"
+#curl -o "data/DNase.K562."$dnase_accession".bw" \
+#	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
+#echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
 
 # Download FOXA1 binding information from JASPAR
 # Example for figures
@@ -69,7 +69,7 @@ do
 	bedtools getfasta -fi data/hg19.fa -bed $line -fo 'data/'$basename'.fa'
 
 	echo "Get flanking  sequences as negative control"
-	python -c get_flanks.py $line > $line'.negative'
+	python get_flanks.py $line > $line'.negative'
 	bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 	echo "Run MEME"
