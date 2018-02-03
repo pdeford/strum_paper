@@ -38,7 +38,7 @@ gunzip data/*gz
 
 # Download FOXA1 binding information from JASPAR
 # Example for figures
-curl -o http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
 
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
@@ -69,7 +69,7 @@ do
 	bedtools getfasta -fi data/hg19.fa -bed $line -fo 'data/'$basename'.fa'
 
 	echo "Get flanking  sequences as negative control"
-	python get_flanks.py $line > $line'.negative'
+	python scripts/get_flanks.py $line > $line'.negative'
 	bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 	echo "Run MEME"
