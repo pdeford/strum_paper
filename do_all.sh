@@ -38,7 +38,7 @@ gunzip data/*gz
 
 # Download FOXA1 binding information from JASPAR
 # Example for figures
-curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+#curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
 
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
