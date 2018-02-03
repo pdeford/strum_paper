@@ -62,27 +62,28 @@ do
 
 	basename=$tf'.'$accession
 
-	echo $basename
+	echo -n "["$(date +"%F %T")"] "; echo $basename
 
 	# Prepare sequence data: Extract peaks and flanking sequences, run MEME
-	echo "Extract sequence for ChIP peaks"
+	echo -n "["$(date +"%F %T")"] "; echo "Extract sequence for ChIP peaks"
 	bedtools getfasta -fi data/hg19.fa -bed $line -fo 'data/'$basename'.fa'
 
 	echo "Get flanking  sequences as negative control"
 	python scripts/get_flanks.py $line > $line'.negative'
 	bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
-	echo "Run MEME"
+	echo -n "["$(date +"%F %T")"] "; echo "Run MEME"
 	meme-chip -oc 'output/'$basename'_meme' -dna -nmeme 500 -seed $seed -noecho \
 	  -norand -meme-nmotifs 1 -dreme-m 1 -spamo-skip 'data/'$basename'.fa'
 
 	# Learn each of the motifs: PWM, DWM, ML-StruM, EM-StruM
+	echo -n "["$(date +"%F %T")"] "; echo "Learn motifs and score seqs"
 	python scripts/do_peak_nonpeak.py $basename $n_process $seed >> output/chip_auc.txt
 
-	echo "Report coefficients of logit model"
+	echo -n "["$(date +"%F %T")"] "; echo "Report coefficients of logit model"
 	./scripts/coeff.py $tf >> output/coefficents.txt
 
-	echo "Compare positioning of most significant matches"
+	echo -n "["$(date +"%F %T")"] "; echo "Compare positioning of most significant matches"
 	./scripts/compare_positions.py $basename $n_process >> output/position_comp.txt
 
 done
