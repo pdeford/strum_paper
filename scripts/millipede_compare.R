@@ -1,7 +1,7 @@
 args <- commandArgs(TRUE)
 factor <- args[1]
 
-source("millipede.1.1.0/millipede_functions.R")
+source("src/millipede.1.1.0/millipede_functions.R")
 library(ROCR)
 library(pracma)
 
