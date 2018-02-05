@@ -49,6 +49,7 @@ def main(basename, n_process=1):
 			matches.append(start)
 
 	if len(matches) < 100:
+		print >> sys.stderr, "Not enough significance (n < 100). Exiting..."
 		return
 
 	matches.sort()
