@@ -17,28 +17,28 @@ touch output/correlations.txt
 # Download necessary data #
 ###########################
 
-# Download reference genome
-rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
-tar xvzf data/chromFa.tar.gz -C ./data
-cat data/chr*.fa > data/hg19.fa
-#rm data/chr*.fa
+# # Download reference genome
+# rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
+# tar xvzf data/chromFa.tar.gz -C ./data
+# cat data/chr*.fa > data/hg19.fa
+# #rm data/chr*.fa
 
-# Download ChIP data for K562 cells
-python scripts/download_K562chip.py > data/accessions.txt
-# Download additional ChIP data for cell type specific predictions
-python scripts/download_OTHERchip.py >> data/accessions.txt
+# # Download ChIP data for K562 cells
+# python scripts/download_K562chip.py > data/accessions.txt
+# # Download additional ChIP data for cell type specific predictions
+# python scripts/download_OTHERchip.py >> data/accessions.txt
 
-gunzip data/*gz
+# gunzip data/*gz
 
-# Download DNase data for K562 cells
-dnase_accession="ENCFF111KJD"
-curl -o "data/DNase.K562."$dnase_accession".bw" \
-	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
-echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
+# # Download DNase data for K562 cells
+# dnase_accession="ENCFF111KJD"
+# curl -o "data/DNase.K562."$dnase_accession".bw" \
+# 	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
+# echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
 
-# Download FOXA1 binding information from JASPAR
-# Example for figures
-curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+# # Download FOXA1 binding information from JASPAR
+# # Example for figures
+# curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
 
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
@@ -136,9 +136,11 @@ done
 # 	fi
 # }
 
+# export -f inside_loop
+
 # # Extract sequence, run MEME, do cell type specific analysis
 # ls data/*.bed | cut -d "." -f1 | cut -d "/" -f2 | sort | uniq |\
-# 	xargs -n 1 -P $n_process inside_loop
+# 	xargs -n 1 -P $n_process  -I {} bash -c 'inside_loop "{}"'
 
 # # Consolidate the output
 # ls output/*_AUCs.txt | while read line;
