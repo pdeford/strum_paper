@@ -3,7 +3,7 @@
 tf=$1
 n=$(ls "data/${tf}."*".bed" | wc -l)
 
-if ls "data/${tf}.K562."*".bed" 1> /dev/null 2>&1; then
+if [ ! $(ls "data/${tf}.K562."*".bed") ]; then
 	rm "data/${tf}"*
 	exit 5
 else
