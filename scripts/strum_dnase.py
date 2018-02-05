@@ -117,7 +117,7 @@ def score_seq_p(PWM, seq):
 	for i in range(len(seq) - k + 1):
 		f, r = 1, 1
 		kmer = seq[i:i+k]
-		rkmer = strum.rev_comp(kmer)
+		rkmer = motif.rev_comp(kmer)
 		for j,n in enumerate(kmer):
 			f *= PWM[nuc_index[n], j]
 			r *= PWM[nuc_index[rkmer[j]], j]
@@ -142,10 +142,10 @@ Y2 = [1 for x in training_sequences] + [0 for x in neg_sequences[:little_n]]
 
 
 print "Train StruM"
-strum = StruM.StruM(load_diprodb=True, mode="protein", n_process=-1)
-strum.train_EM(training_sequences, fasta=False, k=10, max_iter=200, random_seed=808, lim=0.001, n_init=5)
+motif = strum.StruM(load_diprodb=True, mode="protein", n_process=-1)
+motif.train_EM(training_sequences, fasta=False, k=10, max_iter=200, random_seed=808, lim=0.001, n_init=5)
 
-strum.print_PWM(labels=True)
+motif.print_PWM(labels=True)
 
 
 print "Find best scoring position in each training peak"
@@ -157,9 +157,9 @@ pwm_positions = []
 pwm_strand = []
 
 for seq in training_sequences:
-	rseq = strum.rev_comp(seq)
-	f_scores = strum.score_seq(seq)
-	r_scores = strum.score_seq(rseq)
+	rseq = motif.rev_comp(seq)
+	f_scores = motif.score_seq(seq)
+	r_scores = motif.score_seq(rseq)
 	f_i = np.argmax(f_scores)
 	r_i = np.argmax(r_scores)
 	if f_scores[f_i] > r_scores[r_i]:
@@ -167,7 +167,7 @@ for seq in training_sequences:
 		weights.append(f_scores[f_i])
 		strand.append(1)
 	else:
-		positions.append(len(seq)-r_i-strum.k)
+		positions.append(len(seq)-r_i-motif.k)
 		weights.append(r_scores[r_i])
 		strand.append(-1)
 	f_scores, r_scores = score_seq_p(PWM, seq)
@@ -178,7 +178,7 @@ for seq in training_sequences:
 		pwm_scores.append(f_scores[f_i])
 		pwm_strand.append(1)
 	else:
-		pwm_positions.append(len(seq)-r_i-strum.k)
+		pwm_positions.append(len(seq)-r_i-motif.k)
 		pwm_scores.append(r_scores[r_i])
 		pwm_strand.append(-1)
 MOTIF_TRAIN.write(' '.join([str(x) for x in weights]) + "\n")
@@ -194,9 +194,9 @@ pwm_scores_X1 = []
 pwm_positions_X1 = []
 pwm_strand_X1 = []
 for seq in test_sequences:
-	rseq = strum.rev_comp(seq)
-	f_scores = strum.score_seq(seq)
-	r_scores = strum.score_seq(rseq)
+	rseq = motif.rev_comp(seq)
+	f_scores = motif.score_seq(seq)
+	r_scores = motif.score_seq(rseq)
 	X1.append(np.max(np.hstack([f_scores,r_scores])))
 	f_i = np.argmax(f_scores)
 	r_i = np.argmax(r_scores)
@@ -205,7 +205,7 @@ for seq in test_sequences:
 		#X1.append(f_scores[f_i])
 		strand_X1.append(1)
 	else:
-		positions_X1.append(len(seq)-r_i-strum.k)
+		positions_X1.append(len(seq)-r_i-motif.k)
 		#X1.append(r_scores[r_i])
 		strand_X1.append(-1)
 	f_scores, r_scores = score_seq_p(PWM, seq)
@@ -216,7 +216,7 @@ for seq in test_sequences:
 		pwm_scores_X1.append(f_scores[f_i])
 		pwm_strand_X1.append(1)
 	else:
-		pwm_positions_X1.append(len(seq)-r_i-strum.k)
+		pwm_positions_X1.append(len(seq)-r_i-motif.k)
 		pwm_scores_X1.append(r_scores[r_i])
 		pwm_strand_X1.append(-1)
 MOTIF_TEST.write(' '.join([str(x) for x in X1]) + "\n")
@@ -230,14 +230,14 @@ DNase_signals = []
 for i, (chrom, start, stop) in enumerate(training_positions):
 	addition = positions[i]
 	new_start = start + addition
-	trace = lookup_DNase(DNase_bigwig_path, chrom, new_start, new_start + strum.k, True ).ravel()
+	trace = lookup_DNase(DNase_bigwig_path, chrom, new_start, new_start + motif.k, True ).ravel()
 	if strand[i] == -1:
 		trace = trace[::-1]
 	DNase_signals.append(trace)
 	if strand[i] == 1:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+strum.k+50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+strum.k+50, new_start-50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 	
 	addition = pwm_positions[i]
 	new_start = start + addition
@@ -249,23 +249,23 @@ for i, (chrom, start, stop) in enumerate(training_positions):
 
 
 print "Learn DNase component of StruM"
-print strum.k
-DNase_signals = np.asarray(DNase_signals)[:, :3*strum.k]
+print motif.k
+DNase_signals = np.asarray(DNase_signals)[:, :3*motif.k]
 strum_addition = [np.reshape(np.average(DNase_signals, axis=0), [3,-1]), np.reshape(np.std(DNase_signals, axis=0), [3,-1])]
 
 
 
 print "Add DNase to StruM"
-avgs = np.hstack([np.reshape(strum.strum[0], [1, -1]),
+avgs = np.hstack([np.reshape(motif.strum[0], [1, -1]),
 				  np.reshape(strum_addition[0], [1, -1])
 				  ])
-stds = np.hstack([np.reshape(strum.strum[1], [1, -1]),
+stds = np.hstack([np.reshape(motif.strum[1], [1, -1]),
 				  np.reshape(strum_addition[1], [1, -1])
 				  ])
 stds[stds < 0.001] = 0.001
 
-strum.strum = [avgs, stds]
-strum.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseUpstream', 'DNaseCenter', 'DNaseDownstream'])
+motif.strum = [avgs, stds]
+motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseUpstream', 'DNaseCenter', 'DNaseDownstream'])
 
 
 print "Get DNase scores for each test region"
@@ -273,17 +273,17 @@ X2 = []
 for i, seq in enumerate(test_sequences):
 	chrom, start, stop = test_positions[i]
 	seq = seq[:stop-start]
-	rseq = strum.rev_comp(seq)
-	f_scores = strum.score_seq(seq,  *(chrom, start, stop, True))
-	r_scores = strum.score_seq(rseq, *(chrom, stop, start, True))
+	rseq = motif.rev_comp(seq)
+	f_scores = motif.score_seq(seq,  *(chrom, start, stop, True))
+	r_scores = motif.score_seq(rseq, *(chrom, stop, start, True))
 	X2.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 	addition = positions_X1[i]
 	new_start = start + addition
 	if strand_X1[i] == 1:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+strum.k+50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+strum.k+50, new_start-50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 
 	addition = pwm_positions_X1[i]
 	new_start = start + addition
@@ -296,9 +296,9 @@ X3 = []
 for i, seq in enumerate(test_sequences2):
 	chrom, start, stop = test_positions2[i]
 	seq = seq[:stop-start]
-	rseq = strum.rev_comp(seq)
-	f_scores = strum.score_seq(seq,  *(chrom, start, stop, True))
-	r_scores = strum.score_seq(rseq, *(chrom, stop, start, True))
+	rseq = motif.rev_comp(seq)
+	f_scores = motif.score_seq(seq,  *(chrom, start, stop, True))
+	r_scores = motif.score_seq(rseq, *(chrom, stop, start, True))
 	X3.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 X1, X2, X3 = np.asarray(X1), np.asarray(X2), np.asarray(X3)
