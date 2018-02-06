@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 
 tf=$1
-n=$(ls "data/${tf}."*".bed" | wc -l)
+n=$(ls "data/${tf}."*".bed" |  cut -f2 -d '.' | sort | uniq | wc -l)
 
-if [ ! $(ls "data/${tf}.K562."*".bed") ]; then
-	rm "data/${tf}"*
+if [ n == '1' ]; then
+	# rm "data/${tf}."[^K]*
 	exit 5
-else
-	if [ n == '1' ]; then
-		rm "data/${tf}."[^K]*
-		exit 5
-	fi
 fi
 
 # Merge all K562 files for TF
