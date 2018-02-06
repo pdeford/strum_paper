@@ -88,7 +88,7 @@ do
 	python scripts/do_peak_nonpeak.py $basename $n_process $seed >> output/chip_auc.txt
 
 	echo -n "["$(date +"%F %T")"] "; echo "Report coefficients of logit model"
-	./scripts/coeff.py $tf >> output/coefficents.txt
+	./scripts/coeff.py $basename >> output/coefficents.txt
 
 	echo -n "["$(date +"%F %T")"] "; echo "Compare positioning of most significant matches"
 	./scripts/compare_positions.py $basename $n_process >> output/position_comp.txt
