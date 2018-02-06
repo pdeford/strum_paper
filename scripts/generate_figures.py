@@ -201,7 +201,7 @@ plt.savefig('figures/figure1.pdf')
 # motif.plot("output/FOXA1_StruM.png")
 
 fig2, (ax_a, ax_b) = plt.subplots(2, 1, gridspec_kw = {'height_ratios':[1, 2]}, 
-						   figsize=[onecol, 2*onecol])
+						   figsize=[onecol, 1.5*onecol])
 
 pwm_img = mpl.image.imread("output/FOXA1_PWM.png")
 strum_img = mpl.image.imread("output/FOXA1_StruM.png")
