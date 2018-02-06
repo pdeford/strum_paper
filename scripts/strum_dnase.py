@@ -143,7 +143,7 @@ Y2 = [1 for x in training_sequences] + [0 for x in neg_sequences[:little_n]]
 
 
 print "Train StruM"
-motif = strum.StruM(load_diprodb=True, mode="protein", n_process=-1)
+motif = strum.StruM(mode="protein", n_process=-1)
 motif.train_EM(training_sequences, fasta=False, k=10, max_iter=200, random_seed=808, lim=0.001, n_init=5)
 
 motif.print_PWM(labels=True)
