@@ -86,6 +86,7 @@ def bed2seq(bedfile, n_sequences=200, pval_col=6):
 		seqs.append(s)
 		scores.append(float(fields[pval_col]))
 		positions.append((chrom, start, end))
+	return (seqs[:min(len(seqs, n_sequences))], positions[:min(len(seqs, n_sequences))])
 	return ([ x[0] for x in sorted(zip(seqs, scores), key=lambda x:x[1], reverse=True) ][:min(len(scores), n_sequences)],
 	        [ x[0] for x in sorted(zip(positions, scores), key=lambda x:x[1], reverse=True) ][:min(len(scores), n_sequences)])
 
