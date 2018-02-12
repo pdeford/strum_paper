@@ -32,7 +32,7 @@ touch output/correlations.txt
 
 # # Download DNase data for K562 cells
 # dnase_accession="ENCFF111KJD"
-# curl -o "data/DNase.K562."$dnase_accession".bw" \
+# curl -L -o "data/DNase.K562."$dnase_accession".bw" \
 # 	"https://www.encodeproject.org/files/"$dnase_accession"/@@download/"$dnase_accession".bigWig"
 # echo $'DNASE-seq\tK562\t'$dnase_accession >> data/accessions.txt
 
