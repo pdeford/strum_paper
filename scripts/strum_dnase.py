@@ -275,8 +275,8 @@ for i, seq in enumerate(test_sequences):
 	chrom, start, stop = test_positions[i]
 	seq = seq[:stop-start]
 	rseq = motif.rev_comp(seq)
-	f_scores = motif.score_seq(seq,  *(chrom, start, stop, True))
-	r_scores = motif.score_seq(rseq, *(chrom, stop, start, True))
+	f_scores = motif.score_seq(seq,  (chrom, start, stop, True))
+	r_scores = motif.score_seq(rseq, (chrom, stop, start, True))
 	X2.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 	addition = positions_X1[i]
@@ -298,8 +298,8 @@ for i, seq in enumerate(test_sequences2):
 	chrom, start, stop = test_positions2[i]
 	seq = seq[:stop-start]
 	rseq = motif.rev_comp(seq)
-	f_scores = motif.score_seq(seq,  *(chrom, start, stop, True))
-	r_scores = motif.score_seq(rseq, *(chrom, stop, start, True))
+	f_scores = motif.score_seq(seq,  (chrom, start, stop, True))
+	r_scores = motif.score_seq(rseq, (chrom, stop, start, True))
 	X3.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 X1, X2, X3 = np.asarray(X1), np.asarray(X2), np.asarray(X3)
