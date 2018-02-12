@@ -3,8 +3,9 @@
 tf=$1
 n=$(ls "data/${tf}."*".bed" |  cut -f2 -d '.' | sort | uniq | wc -l)
 
-if [ n == '1' ]; then
+if [ $n == '1' ]; then
 	# rm "data/${tf}."[^K]*
+	echo "No other cell types for " $tf ". Exiting..."
 	exit 5
 fi
 
