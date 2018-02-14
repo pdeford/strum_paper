@@ -104,7 +104,7 @@ def main(basename, n_process=1):
 	fimo_mat = np.zeros(scores.shape)
 	adjust = 0
 	i = 0
-	for chrom in regions:
+	for chrom in sorted(regions.keys()):
 		for r in regions[chrom]:
 			left = r - 100
 			if left < 0:
