@@ -61,7 +61,7 @@ def main(basename, n_process=1):
 			if matchlist[i] - matchlist[i-1] < 50:
 				tmp.append(matchlist[i])
 			else:
-				regions.append(int(np.average(tmp)))
+				regions.setdefault(chrom, []).append(int(np.average(tmp)))
 				tmp = [matchlist[i]]
 		else:
 			regions.setdefault(chrom, []).append(int(np.average(tmp)))
