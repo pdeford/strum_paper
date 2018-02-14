@@ -37,40 +37,42 @@ def main(basename, n_process=1):
 
 	k = pwm.shape[1]
 
-	coi = 'chr21'
 	f = open("output/{}_meme/fimo_out_1/fimo.txt".format(basename))
 	f.readline()
-	matches = []
+	matches = {}
 	for line in f:
 		fields = line.split()
 		chrom = fields[1]
 		start = int(fields[2])
-		if chrom == coi:
-			matches.append(start)
+		matches.setdefault(chrom, []).append(start)
 
-	if len(matches) < 100:
+	if sum([len(matches[chrom]) for chrom in matches]) < 100:
 		print >> sys.stderr, "Not enough significance (n < 100). Exiting..."
 		return
 
-	matches.sort()
+	for chrom in matches.keys():
+		matches[chrom].sort()
 
-	regions = []
-	tmp = [matches[0]]
-	for i in range(1, len(matches)):
-		if matches[i] - matches[i-1] < 50:
-			tmp.append(matches[i])
+	regions = {}
+	for chrom in matches:
+		matchlist = matches[chrom]
+		tmp = [matchlist[0]]
+		for i in range(1, len(matchlist)):
+			if matchlist[i] - matchlist[i-1] < 50:
+				tmp.append(matchlist[i])
+			else:
+				regions.append(int(np.average(tmp)))
+				tmp = [matchlist[i]]
 		else:
-			regions.append(int(np.average(tmp)))
-			tmp = [matches[i]]
-	else:
-		regions.append(int(np.average(tmp)))
+			regions.setdefault(chrom, []).append(int(np.average(tmp)))
 
 	with open("output/{}_top_matches.bed".format(basename), "wb") as f:
-		for pos in regions:
-			start = pos - 100
-			if start < 0:
-				continue
-			f.write("{}\t{}\t{}\n".format(coi, pos-100, pos+100))
+		for chrom in sorted(regions.keys()):
+			for pos in regions[chrom]:
+				start = pos - 100
+				if start < 0:
+					continue
+				f.write("{}\t{}\t{}\n".format(chrom, start, pos+100))
 
 	subprocess.call(
 		"bedtools getfasta -fi data/hg19.fa -bed {} -fo 'data/{}_matches.fa'".format(
@@ -100,6 +102,8 @@ def main(basename, n_process=1):
 	bin_scores = np.zeros(scores.shape)
 	bin_scores[scores > thresh] = 1
 
+	regions = [r for chrom in sorted(regions.keys()) for r in regions[chrom]]
+
 	fimo_mat = np.zeros(scores.shape)
 	adjust = 0
 	for i,r in enumerate(regions):
@@ -124,12 +128,14 @@ def main(basename, n_process=1):
 	# plt.xticks([0, 49, 99, 149, 199], [-100, -50, 0, 50, 100])
 	# plt.xlabel("Position (bp)")
 	plt.yticks([])
+	plt.xticks([])
 	plt.subplot(122)
 	plt.pcolor(bin_scores, cmap='YlGnBu')
 	plt.axis('tight')
 	# plt.xticks([0, 49, 99, 149, 199], [-100, -50, 0, 50, 100])
 	# plt.xlabel("Position (bp)")
 	plt.yticks([])
+	plt.xticks([])
 	plt.subplots_adjust(left=0,bottom=0,top=1,right=1,wspace=0.01)
 	plt.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
 	plt.close()
