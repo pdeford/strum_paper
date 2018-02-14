@@ -81,8 +81,7 @@ def main(basename, n_process=1):
 
 	# Load in original sequences from ChIP experiment
 	headers, sequences = fasta_reader(open("data/{}_matches.fa".format(basename)))
-
-	n = len(matches)
+	n = sum([len(matches[chrom]) for chrom in matches])
 
 	####SCORE THE SEQUENCES WITH STRUM
 	####FILTER FOR `n` TOP SITES
@@ -102,24 +101,40 @@ def main(basename, n_process=1):
 	bin_scores = np.zeros(scores.shape)
 	bin_scores[scores > thresh] = 1
 
-	regions = [r for chrom in sorted(regions.keys()) for r in regions[chrom]]
-
 	fimo_mat = np.zeros(scores.shape)
 	adjust = 0
-	for i,r in enumerate(regions):
-		left = r - 100
-		if r < 0: 
-			adjust += 1
-			continue
-		right = r + 100
-		for pos in matches:
-			if pos < left:
+	i = 0
+	for chrom in regions:
+		for r in regions[chrom]:
+			left = r - 100
+			if left < 0:
 				continue
-			elif pos >= right:
-				break
-			else:
-				j = pos - left
-				fimo_mat[i-adjust,j] = 1
+			right = r + 100:
+			for pos in matches[chrom]:
+				if pos < left:
+					continue
+				elif pos >= right: 
+					break
+				else:
+					j = pos - left
+					fimo_mat[i, j] = 1
+			i += 1
+
+
+	# for i,r in enumerate(regions):
+	# 	left = r - 100
+	# 	if left < 0: 
+	# 		adjust += 1
+	# 		continue
+	# 	right = r + 100
+	# 	for pos in matches:
+	# 		if pos < left:
+	# 			continue
+	# 		elif pos >= right:
+	# 			break
+	# 		else:
+	# 			j = pos - left
+	# 			fimo_mat[i-adjust,j] = 1
 
 	plt.figure(figsize=[12,6])
 	plt.subplot(121)
