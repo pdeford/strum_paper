@@ -109,7 +109,7 @@ def main(basename, n_process=1):
 			left = r - 100
 			if left < 0:
 				continue
-			right = r + 100:
+			right = r + 100
 			for pos in matches[chrom]:
 				if pos < left:
 					continue
