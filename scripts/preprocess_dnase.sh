@@ -17,13 +17,13 @@ echo "${files[0]}" >> output/dnase_accessions.txt
 ls "data/${tf}."[^K]*".bed" >> output/dnase_accessions.txt
 
 # Extract the peaks that are not in any of the other files
-bedtools intersect -v -a "{files[0]}" -b "data/${tf}."[^K]*".bed" > "output/unique_${tf}.bed"
+bedtools intersect -v -wa -a "${files[0]}" -b "data/${tf}."[^K]*".bed" > "output/unique_${tf}.bed"
 
 # Extract the peaks that are in every file
-bedtools intersect -c -wa -a "{files[0]}" -b "data/${tf}."*".bed" | grep $n"$" > "output/ubiq_${tf}.bed"
+bedtools intersect -c -wa -a "${files[0]}" -b "data/${tf}."[^K]*".bed" "${files[0]}" | grep $n"$" > "output/ubiq_${tf}.bed"
 
 # Store the peaks that are in neither all nor none of the other files
-bedtools intersect -v -a "{files[0]}" -b "output/ubiq_${tf}.bed" "output/unique_${tf}.bed" > "output/med_${tf}.bed"
+bedtools intersect -v -wa -a "${files[0]}" -b "output/ubiq_${tf}.bed" "output/unique_${tf}.bed" > "output/med_${tf}.bed"
 
 # Get some peaks that are not in K562
-bedtools intersect -v -a $(ls "data/${tf}."[^K]*".bed" | head -n1) -b "{files[0]}" > "output/not_K562_${tf}.bed"
+bedtools intersect -v -wa -a $(ls "data/${tf}."[^K]*".bed" | head -n1) -b "${files[0]}" > "output/not_K562_${tf}.bed"
