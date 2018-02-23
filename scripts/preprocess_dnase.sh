@@ -24,12 +24,15 @@ bedtools intersect -v -wa -a "${files[0]}" -b "output/ubiq_${tf}.bed" "output/un
 # Get some peaks that are not in K562
 bedtools intersect -v -wa -a $(ls "data/${tf}."[^K]*".bed" | head -n1) -b "${files[0]}" > "output/not_K562_${tf}.bed"
 
+# Make sure there are ample sequences available
 nt=$(wc -l "output/unique_${tf}.bed" | cut -f1 -d ' ')
 np=$(wc -l "output/med_${tf}.bed" | cut -f1 -d ' ')
 nn=$(wc -l "output/not_K562_${tf}.bed" | cut -f1 -d ' ')
 
 if [ $nt < 200 ] || [ $np < 200 ] || [ $nn < 200 ]; then
 	echo "Not enough sequences for " $tf ". Exiting..."
+	exit 5
+fi
 
 # Record Accession numbers being used
 echo "${files[0]}" >> output/dnase_accessions.txt
