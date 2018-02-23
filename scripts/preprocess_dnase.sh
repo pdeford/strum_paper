@@ -12,10 +12,6 @@ fi
 pattern="data/${tf}.K562.*.bed"
 files=( $pattern )
 
-# Record Accession numbers being used
-echo "${files[0]}" >> output/dnase_accessions.txt
-ls "data/${tf}."[^K]*".bed" >> output/dnase_accessions.txt
-
 # Extract the peaks that are not in any of the other files
 bedtools intersect -v -wa -a "${files[0]}" -b "data/${tf}."[^K]*".bed" > "output/unique_${tf}.bed"
 
@@ -27,3 +23,14 @@ bedtools intersect -v -wa -a "${files[0]}" -b "output/ubiq_${tf}.bed" "output/un
 
 # Get some peaks that are not in K562
 bedtools intersect -v -wa -a $(ls "data/${tf}."[^K]*".bed" | head -n1) -b "${files[0]}" > "output/not_K562_${tf}.bed"
+
+nt=$(wc -l "output/unique_${tf}.bed" | cut -f1 -d ' ')
+np=$(wc -l "output/med_${tf}.bed" | cut -f1 -d ' ')
+nn=$(wc -l "output/not_K562_${tf}.bed" | cut -f1 -d ' ')
+
+if [ $nt < 200 ] || [ $np < 200 ] || [ $nn < 200 ]; then
+	echo "Not enough sequences for " $tf ". Exiting..."
+
+# Record Accession numbers being used
+echo "${files[0]}" >> output/dnase_accessions.txt
+ls "data/${tf}."[^K]*".bed" >> output/dnase_accessions.txt
