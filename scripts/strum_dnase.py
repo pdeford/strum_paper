@@ -52,7 +52,7 @@ def lookup_sequence(chrom,start=None,end=None):
             sequence = "".join(f_c.read().split("\n")[1:])
     return sequence.upper()
 
-def lookup_DNase(data, chrom, start, end, extend = False):
+def lookup_DNase(seq, data, chrom, start, end, extend = False):
 	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	if extend:
 		extend = abs(start-end)-1
