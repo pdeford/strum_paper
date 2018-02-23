@@ -29,7 +29,7 @@ nt=$(wc -l "output/unique_${tf}.bed" | cut -f1 -d ' ')
 np=$(wc -l "output/med_${tf}.bed" | cut -f1 -d ' ')
 nn=$(wc -l "output/not_K562_${tf}.bed" | cut -f1 -d ' ')
 
-if [ $nt < 200 ] || [ $np < 200 ] || [ $nn < 200 ]; then
+if [ $nt -lt 200 ] || [ $np -lt 200 ] || [ $nn -lt 200 ]; then
 	echo "Not enough sequences for " $tf ". Exiting..."
 	exit 5
 fi
