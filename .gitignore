@@ -1,0 +1,5 @@
+*.pyc
+slurm-*
+data/*
+job_sub.sh
+output/*
