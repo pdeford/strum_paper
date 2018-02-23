@@ -231,21 +231,21 @@ DNase_signals = []
 for i, (chrom, start, stop) in enumerate(training_positions):
 	addition = positions[i]
 	new_start = start + addition
-	trace = lookup_DNase(DNase_bigwig_path, chrom, new_start, new_start + motif.k, True ).ravel()
+	trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_start + motif.k, True ).ravel()
 	if strand[i] == -1:
 		trace = trace[::-1]
 	DNase_signals.append(trace)
 	if strand[i] == 1:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 	
 	addition = pwm_positions[i]
 	new_start = start + addition
 	if pwm_strand[i] == 1:
-		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
+		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
 	else:
-		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
+		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
 
 
 
