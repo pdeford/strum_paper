@@ -282,16 +282,16 @@ for i, seq in enumerate(test_sequences):
 	addition = positions_X1[i]
 	new_start = start + addition
 	if strand_X1[i] == 1:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 
 	addition = pwm_positions_X1[i]
 	new_start = start + addition
 	if pwm_strand_X1[i] == 1:
-		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
+		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
 	else:
-		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase(DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
+		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
 
 X3 = []
 for i, seq in enumerate(test_sequences2):
