@@ -53,42 +53,42 @@ def lookup_sequence(chrom,start=None,end=None):
     return sequence.upper()
 
 def lookup_DNase(seq, data, chrom, start, end, extend = False):
-	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
-	extend = 0
-	trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
-	if trace is None:
-		trace = np.zeros(abs(start-end)-1+2*extend)
-	trace[np.isnan(trace)] = 0.0
-	trace -= np.min(trace)
-
-	if start > end:
-		trace = trace[::-1]
-
-	if not all(trace==0.0):
-		trace /= np.max(trace)
-	return trace
-
 	# bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
-	# if extend:
-	# 	extend = abs(start-end)-1
-	# else:
-	# 	extend = 0
+	# extend = 0
 	# trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
 	# if trace is None:
 	# 	trace = np.zeros(abs(start-end)-1+2*extend)
 	# trace[np.isnan(trace)] = 0.0
 	# trace -= np.min(trace)
-	#
+
 	# if start > end:
 	# 	trace = trace[::-1]
-	#
+
 	# if not all(trace==0.0):
 	# 	trace /= np.max(trace)
-	#
-	# if extend != 0:
-	# 	return np.reshape(trace, [3,-1])
-	# else:
-	# 	return trace
+	# return trace
+
+	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
+	if extend:
+		extend = abs(start-end)-1
+	else:
+		extend = 0
+	trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
+	if trace is None:
+		trace = np.zeros(abs(start-end)-1+2*extend)
+	trace[np.isnan(trace)] = 0.0
+	trace -= np.min(trace)
+	
+	if start > end:
+		trace = trace[::-1]
+	
+	if not all(trace==0.0):
+		trace /= np.max(trace)
+	
+	if extend != 0:
+		return np.reshape(trace, [3,-1])
+	else:
+		return trace
 
 def bed2seq(bedfile, n_sequences=200, pval_col=6):
 	seqs = []
