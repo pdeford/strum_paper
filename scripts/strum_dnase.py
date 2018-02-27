@@ -54,6 +54,7 @@ def lookup_sequence(chrom,start=None,end=None):
 
 def lookup_DNase(seq, data, chrom, start, end, extend = False):
 	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
+	extend = 0
 	trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
 	if trace is None:
 		trace = np.zeros(abs(start-end)-1+2*extend)
