@@ -66,7 +66,7 @@ def lookup_DNase(seq, data, chrom, start, end, extend = False):
 
 	if not all(trace==0.0):
 		trace /= np.max(trace)
-	return trace
+	return np.reshape(trace, [1,-1])
 
 	# bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	# if extend:
