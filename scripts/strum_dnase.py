@@ -53,7 +53,7 @@ def lookup_sequence(chrom,start=None,end=None):
     return sequence.upper()
 
 def lookup_DNase(seq, data, chrom, start, end, extend = False):
-	# bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
+	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	# extend = 0
 	# trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
 	# if trace is None:
@@ -66,9 +66,9 @@ def lookup_DNase(seq, data, chrom, start, end, extend = False):
 
 	# if not all(trace==0.0):
 	# 	trace /= np.max(trace)
-	# return np.reshape(trace, [1,-1])
+	# return trace
 
-	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
+	# bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	if extend:
 		extend = abs(start-end)-1
 	else:
@@ -266,8 +266,8 @@ for i, (chrom, start, stop) in enumerate(training_positions):
 
 print "Learn DNase component of StruM"
 print motif.k
-DNase_signals = np.asarray(DNase_signals)[:, :1*motif.k]
-strum_addition = [np.reshape(np.average(DNase_signals, axis=0), [1,-1]), np.reshape(np.std(DNase_signals, axis=0), [1,-1])]
+DNase_signals = np.asarray(DNase_signals)[:, :3*motif.k]
+strum_addition = [np.reshape(np.average(DNase_signals, axis=0), [3,-1]), np.reshape(np.std(DNase_signals, axis=0), [3,-1])]
 
 
 
@@ -281,7 +281,7 @@ stds = np.hstack([np.reshape(motif.strum[1], [1, -1]),
 stds[stds < 0.001] = 0.001
 
 motif.strum = [avgs, stds]
-motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseCenter'])
+motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseUpstream', 'DNaseCenter', 'DNaseDownstream'])
 
 
 print "Get DNase scores for each test region"
