@@ -73,10 +73,16 @@ def lookup_DNase(seq, data, chrom, start, end, extend = False):
 		extend = abs(start-end)-1
 	else:
 		extend = 0
-	trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
-	if trace is None:
+	intervals = bwh.get(chrom, min(start,end)-extend, max(start, end)-1+extend)
+	if intervals is None:
 		trace = np.zeros(abs(start-end)-1+2*extend)
-	trace[np.isnan(trace)] = 0.0
+	# trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
+	else:
+		trace = np.zeros((max(start, end)-1+extend) - (min(start,end)-extend))
+		trace[...] = np.nan
+		for s,e,v in bwh.get(chrom, min(start,end)-extend, max(start, end)-1+extend):
+		        trace[s - (min(start,end)-extend)] = v
+		trace[np.isnan(trace)] = 0.0
 	trace -= np.min(trace)
 	
 	if start > end:
