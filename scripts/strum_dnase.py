@@ -252,7 +252,7 @@ DNase_signals = []
 for i, (chrom, start, stop) in enumerate(training_positions):
 	addition = positions[i]
 	new_start = start + addition
-	trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_start + motif.k, True ).ravel()
+	trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_start + motif.k, False ).ravel()
 	if strand[i] == -1:
 		trace = trace[::-1]
 	DNase_signals.append(trace)
@@ -287,7 +287,7 @@ stds = np.hstack([np.reshape(motif.strum[1], [1, -1]),
 stds[stds < 0.001] = 0.001
 
 motif.strum = [avgs, stds]
-motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseUpstream', 'DNaseCenter', 'DNaseDownstream'])
+motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseCenter',])
 
 
 print "Get DNase scores for each test region"
@@ -296,8 +296,8 @@ for i, seq in enumerate(test_sequences):
 	chrom, start, stop = test_positions[i]
 	seq = seq[:stop-start]
 	rseq = motif.rev_comp(seq)
-	f_scores = motif.score_seq((seq,  (chrom, start, stop, True)))
-	r_scores = motif.score_seq((rseq, (chrom, stop, start, True)))
+	f_scores = motif.score_seq((seq,  (chrom, start, stop, False)))
+	r_scores = motif.score_seq((rseq, (chrom, stop, start, False)))
 	X2.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 	addition = positions_X1[i]
@@ -319,8 +319,8 @@ for i, seq in enumerate(test_sequences2):
 	chrom, start, stop = test_positions2[i]
 	seq = seq[:stop-start]
 	rseq = motif.rev_comp(seq)
-	f_scores = motif.score_seq((seq,  (chrom, start, stop, True)))
-	r_scores = motif.score_seq((rseq, (chrom, stop, start, True)))
+	f_scores = motif.score_seq((seq,  (chrom, start, stop, False)))
+	r_scores = motif.score_seq((rseq, (chrom, stop, start, False)))
 	X3.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 X1, X2, X3 = np.asarray(X1), np.asarray(X2), np.asarray(X3)
