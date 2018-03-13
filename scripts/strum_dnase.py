@@ -88,8 +88,8 @@ def lookup_DNase(seq, data, chrom, start, end, extend = False):
 	if start > end:
 		trace = trace[::-1]
 	
-	if not all(trace==0.0):
-		trace /= np.max(trace)
+	# if not all(trace==0.0):
+	# 	trace /= np.max(trace)
 	
 	if extend != 0:
 		return np.reshape(trace, [3,-1])
