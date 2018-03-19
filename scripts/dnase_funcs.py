@@ -3,7 +3,7 @@ EXAMPLE DNASE LOOKUP FUNCTIONS TO TRY
 """
 
 # Basic: One value per position in the motif.
-def lookup_DNase1(seq, data, chrom, start, end):
+def lookup_DNase1(seq, data, chrom, start, end, *args, **kwargs):
 	if start > end:
 		trace_start = end
 		trace_end = start - 1
@@ -24,7 +24,7 @@ def lookup_DNase1(seq, data, chrom, start, end):
 	return trace.reshape([1,-1])
 
 # Basic + Normalized
-def lookup_DNase2(seq, data, chrom, start, end):
+def lookup_DNase2(seq, data, chrom, start, end, *args, **kwargs):
 	if start > end:
 		trace_start = end
 		trace_end = start - 1
@@ -49,7 +49,7 @@ def lookup_DNase2(seq, data, chrom, start, end):
 	return trace.reshape([1,-1])
 
 # Nucleotide resolution, including adjacent bases -- extended window
-def lookup_DNase3(seq, data, chrom, start, end):
+def lookup_DNase3(seq, data, chrom, start, end, *args, **kwargs):
 	n_windows = 1
 	if start > end:
 		trace_start = end
@@ -72,7 +72,7 @@ def lookup_DNase3(seq, data, chrom, start, end):
 	return trace.reshape([2*n_windows+1,-1])
 
 # Extended window, normalized
-def lookup_DNase4(seq, data, chrom, start, end):
+def lookup_DNase4(seq, data, chrom, start, end, *args, **kwargs):
 	n_windows = 1
 	if start > end:
 		trace_start = end
@@ -99,7 +99,7 @@ def lookup_DNase4(seq, data, chrom, start, end):
 	return trace.reshape([2*n_windows+1,-1])
 
 # Bin local region
-def lookup_DNase5(seq, data, chrom, start, end):
+def lookup_DNase5(seq, data, chrom, start, end, *args, **kwargs):
 	n_windows = 1
 	if start > end:
 		trace_start = end
@@ -128,7 +128,7 @@ def lookup_DNase5(seq, data, chrom, start, end):
 	return trace.reshape([1,-1])
 
 # Bin local region, normalized
-def lookup_DNase6(seq, data, chrom, start, end):
+def lookup_DNase6(seq, data, chrom, start, end, *args, **kwargs):
 	n_windows = 2
 	if start > end:
 		trace_start = end
