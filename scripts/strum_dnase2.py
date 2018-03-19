@@ -278,7 +278,7 @@ for i, seq in enumerate(test_sequences):
 	seq = seq[:stop-start]
 	rseq = motif.rev_comp(seq)
 	f_scores = motif.score_seq((seq,  (chrom, start, stop-1, False)))
-	r_scores = motif.score_seq((rseq, (chrom, stop, start+1, False)))
+	r_scores = motif.score_seq((rseq, (chrom, stop-1, start, False)))
 	X2.append(np.max(np.hstack([ f_scores, r_scores ])))
 
 	addition = positions_X1[i]
