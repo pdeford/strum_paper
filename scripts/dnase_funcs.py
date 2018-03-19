@@ -2,7 +2,7 @@
 EXAMPLE DNASE LOOKUP FUNCTIONS TO TRY
 """
 
-import numpy
+import numpy as np
 import bx.bbi.bigwig_file
 
 # Basic: One value per position in the motif.
