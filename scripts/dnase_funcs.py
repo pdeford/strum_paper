@@ -2,6 +2,9 @@
 EXAMPLE DNASE LOOKUP FUNCTIONS TO TRY
 """
 
+import numpy
+import bx.bbi.bigwig_file
+
 # Basic: One value per position in the motif.
 def lookup_DNase1(seq, data, chrom, start, end, *args, **kwargs):
 	if start > end:
