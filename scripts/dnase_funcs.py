@@ -22,6 +22,8 @@ def lookup_DNase1(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 	return trace.reshape([1,-1])
@@ -43,6 +45,8 @@ def lookup_DNase2(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 	# Normalize the trace
@@ -70,6 +74,8 @@ def lookup_DNase3(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start + 2*width*n_windows)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 	return trace.reshape([2*n_windows+1,-1])
@@ -93,6 +99,8 @@ def lookup_DNase4(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start + 2*width*n_windows)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 	# Normalize the trace
@@ -120,6 +128,8 @@ def lookup_DNase5(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start + 2*width*n_windows)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 
@@ -149,6 +159,8 @@ def lookup_DNase6(seq, data, chrom, start, end, *args, **kwargs):
 		trace = np.zeros(trace_end - trace_start + 2*width*n_windows)
 	# Replace nan's with zeros
 	trace[np.isnan(trace)] = 0.0
+	# Make sure it is the right size
+	trace = trace[:trace_end-trace_start]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
 
