@@ -13,6 +13,7 @@ def lookup_DNase1(seq, data, chrom, start, end, *args, **kwargs):
 	else:
 		trace_start = start
 		trace_end = end - 1
+	width = trace_end - trace_start
 	# Load bigwig file
 	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	# Extract region of interest
@@ -36,6 +37,7 @@ def lookup_DNase2(seq, data, chrom, start, end, *args, **kwargs):
 	else:
 		trace_start = start
 		trace_end = end - 1
+	width = trace_end - trace_start
 	# Load bigwig file
 	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
 	# Extract region of interest
