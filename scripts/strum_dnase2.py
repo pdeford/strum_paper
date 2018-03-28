@@ -75,7 +75,7 @@ def lookup_DNase_sig(seq, data, chrom, start, end, *args, **kwargs):
 	trace[np.isnan(trace)] = 0.0
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
-	return trace.reshape([1,-1])
+	return trace.ravel()
 
 def bed2seq(bedfile, n_sequences=200, pval_col=6):
 	seqs = []
@@ -233,9 +233,11 @@ DNase_signals = []
 for i, (chrom, start, stop) in enumerate(training_positions):
 	addition = positions[i]
 	new_start = start + addition
-	trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_start + motif.k, False ).ravel()
-	if strand[i] == -1:
-		trace = trace[::-1]
+	new_end = new_start + motif.k
+	if strand[i] == 1:
+		trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_end, False )
+	else:
+		trace = lookup_DNase("", DNase_bigwig_path, chrom, new_end, new_start, False )
 	DNase_signals.append(trace)
 	if strand[i] == 1:
 		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
@@ -269,7 +271,6 @@ stds[stds < 0.001] = 0.001
 
 motif.strum = [avgs, stds]
 motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNase' for row in strum_addition[0]])
-
 
 print "Get DNase scores for each test region"
 X2 = []
