@@ -11,6 +11,7 @@ from sklearn.metrics import roc_curve, roc_auc_score
 from strum import strum
 import bx.bbi.bigwig_file
 
+from dnase_funcs import lookup_DNase6 as lookup_DNase
 
 DNase_bigwig_path = sys.argv[1]
 chrom_path = sys.argv[2]
@@ -52,49 +53,25 @@ def lookup_sequence(chrom,start=None,end=None):
             sequence = "".join(f_c.read().split("\n")[1:])
     return sequence.upper()
 
-def lookup_DNase(seq, data, chrom, start, end, extend = False):
-	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
-	# extend = 0
-	# trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
-	# if trace is None:
-	# 	trace = np.zeros(abs(start-end)-1+2*extend)
-	# trace[np.isnan(trace)] = 0.0
-	# trace -= np.min(trace)
-
-	# if start > end:
-	# 	trace = trace[::-1]
-
-	# if not all(trace==0.0):
-	# 	trace /= np.max(trace)
-	# return trace
-
-	# bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
-	if extend:
-		extend = abs(start-end)-1
-	else:
-		extend = 0
-	intervals = bwh.get(chrom, min(start,end)-extend, max(start, end)-1+extend)
-	if intervals is None:
-		trace = np.zeros(abs(start-end)-1+2*extend)
-	# trace = bwh.get_as_array(chrom, min(start,end)-extend, max(start, end)-1+extend)
-	else:
-		trace = np.zeros((max(start, end)-1+extend) - (min(start,end)-extend))
-		trace[...] = np.nan
-		for s,e,v in bwh.get(chrom, min(start,end)-extend, max(start, end)-1+extend):
-		        trace[s - (min(start,end)-extend)] = v
-		trace[np.isnan(trace)] = 0.0
-	trace -= np.min(trace)
-	
+def lookup_DNase_sig(seq, data, chrom, start, end, *args, **kwargs):
 	if start > end:
-		trace = trace[::-1]
-	
-	# if not all(trace==0.0):
-	# 	trace /= np.max(trace)
-	
-	if extend != 0:
-		return np.reshape(trace, [3,-1])
+		trace_start = end
+		trace_end = start - 1
 	else:
-		return trace
+		trace_start = start
+		trace_end = end - 1
+	# Load bigwig file
+	bwh = bx.bbi.bigwig_file.BigWigFile(open(data))
+	# Extract region of interest
+	trace = bwh.get_as_array(chrom, trace_start,trace_end)
+	# If nothing is returned, return all zeros
+	if trace is None:
+		trace = np.zeros(trace_end - trace_start)
+	# Replace nan's with zeros
+	trace[np.isnan(trace)] = 0.0
+	# Reverse if interested in the other strand
+	if start > end: trace = trace[::-1]
+	return trace.ravel()
 
 def bed2seq(bedfile, n_sequences=200, pval_col=6):
 	seqs = []
@@ -252,28 +229,30 @@ DNase_signals = []
 for i, (chrom, start, stop) in enumerate(training_positions):
 	addition = positions[i]
 	new_start = start + addition
-	trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_start + motif.k, False ).ravel()
-	if strand[i] == -1:
-		trace = trace[::-1]
+	new_end = new_start + motif.k
+	if strand[i] == 1:
+		trace = lookup_DNase("", DNase_bigwig_path, chrom, new_start, new_end, False )
+	else:
+		trace = lookup_DNase("", DNase_bigwig_path, chrom, new_end, new_start, False )
 	DNase_signals.append(trace)
 	if strand[i] == 1:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
+		DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 	
 	addition = pwm_positions[i]
 	new_start = start + addition
 	if pwm_strand[i] == 1:
-		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
+		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
 	else:
-		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
+		PWM_DNASE_TRAIN.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
 
 
 
 print "Learn DNase component of StruM"
 print motif.k
-DNase_signals = np.asarray(DNase_signals)[:, :3*motif.k]
-strum_addition = [np.reshape(np.average(DNase_signals, axis=0), [3,-1]), np.reshape(np.std(DNase_signals, axis=0), [3,-1])]
+DNase_signals = np.asarray(DNase_signals)
+strum_addition = [np.average(DNase_signals, axis=0), np.std(DNase_signals, axis=0)]
 
 
 
@@ -287,7 +266,7 @@ stds = np.hstack([np.reshape(motif.strum[1], [1, -1]),
 stds[stds < 0.001] = 0.001
 
 motif.strum = [avgs, stds]
-motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNaseCenter',])
+motif.update(data=DNase_bigwig_path, func=lookup_DNase, features=['DNase' for row in strum_addition[0]])
 
 
 print "Get DNase scores for each test region"
@@ -303,16 +282,16 @@ for i, seq in enumerate(test_sequences):
 	addition = positions_X1[i]
 	new_start = start + addition
 	if strand_X1[i] == 1:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start-50, new_start+motif.k+50)]) + "\n")
 	else:
-		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
+		DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start+motif.k+50, new_start-50)]) + "\n")
 
 	addition = pwm_positions_X1[i]
 	new_start = start + addition
 	if pwm_strand_X1[i] == 1:
-		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
+		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start-50, new_start+pwm_k+50)]) + "\n")
 	else:
-		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
+		PWM_DNASE_TEST.write(" ".join([str(x) for x in lookup_DNase_sig("", DNase_bigwig_path, chrom, new_start+pwm_k+50, new_start-50)]) + "\n")
 
 X3 = []
 for i, seq in enumerate(test_sequences2):
