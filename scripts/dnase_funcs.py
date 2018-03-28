@@ -27,7 +27,8 @@ def lookup_DNase1(seq, data, chrom, start, end, *args, **kwargs):
 	trace = trace[:width]
 	# Reverse if interested in the other strand
 	if start > end: trace = trace[::-1]
-	return trace.reshape([1,-1])
+	trace = trace.reshape([1,-1])
+	return trace
 
 # Basic + Normalized
 def lookup_DNase2(seq, data, chrom, start, end, *args, **kwargs):
