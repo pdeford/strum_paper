@@ -205,7 +205,7 @@ def score_dwm(DWM, kmer):
 
 def score_strum(strum, kmer):
 	"""Score a kmer with a given StruM, and return log10 of the score."""
-	return strum.eval(strum.translate(kmer))
+	return strum.eval_filt(strum.translate(kmer))
 
 def rev_comp(seq):
 	"""Return the reverse complement of a nucleotide sequence."""

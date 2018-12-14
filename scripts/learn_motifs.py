@@ -42,6 +42,7 @@ def learn(basename, n_process, random_seed):
 	pwm = learn_pwm(sequences)
 	dwm = learn_dwm(sequences)
 	ml_strum = learn_strum(sequences)
+	ml_strum.filter()
 
 	k = pwm.shape[1]
 
@@ -53,6 +54,7 @@ def learn(basename, n_process, random_seed):
 	em_strum = strum.StruM(mode='groove', n_process=n_process)
 	em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
 		k=(k-1), max_iter=250, random_seed=random_seed)
+	em_strum.filter()
 
 	return (pwm, dwm, ml_strum, em_strum), sequences
 

@@ -61,7 +61,7 @@ def score_DWM(DWM, kmer):
 
 def score_StruM(strum, kmer):
 	"""Score a kmer with a given StruM, and return log10 of the score."""
-	return strum.eval(strum.translate(kmer))
+	return strum.eval_filt(strum.translate(kmer))
 
 if __name__ == '__main__':
 	tf = sys.argv[1]
