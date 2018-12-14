@@ -28,9 +28,6 @@ cut -f1,2 data/hg19.fa.fai > data/hg19sizes.genome
 # Download ChIP data for K562 cells
 python scripts/download_K562chip.py > data/accessions.txt
 
-# Download additional ChIP data for cell type specific predictions
-python scripts/download_OTHERchip.py >> data/accessions.txt
-
 gunzip data/*gz
 
 # Download FOXA1 binding information from JASPAR
