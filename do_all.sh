@@ -22,6 +22,8 @@ rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.
 tar xvzf data/chromFa.tar.gz -C ./data
 cat data/chr*.fa > data/hg19.fa
 rm data/chr*.fa
+samtools faidx data/hg19.fa 
+cut -f1,2 data/hg19.fa.fai > data/hg19sizes.genome
 
 # Download ChIP data for K562 cells
 python scripts/download_K562chip.py > data/accessions.txt
@@ -71,7 +73,8 @@ do
 	bedtools getfasta -fi data/hg19.fa -bed $line -fo 'data/'$basename'.fa'
 
 	echo "Get flanking  sequences as negative control"
-	python scripts/get_flanks.py $line > $line'.negative'
+	bedtools flank -r 1.0 -pct -i $line -g data/hg19sizes.genome |\
+		bedtools shift -i stding -g data/hg19sizes.genome -s 0.2 -pct > $line'.negative'
 	bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 	echo -n "["$(date +"%F %T")"] "; echo "Run MEME"
