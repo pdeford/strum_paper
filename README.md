@@ -1,4 +1,4 @@
-## StruMs: A flexible and extensible model of TF-DNA interactions
+# StruMs: A flexible and extensible model of TF-DNA interactions
 
 This GitHub repository is associated with the paper _StruMs: A flexible and extensible model of TF-DNA interactions_ by P. DeFord and J. Taylor, and reproduces all of the analysis and figures from that paper.
 
@@ -6,13 +6,46 @@ This analysis relies heavily on the **StruM package**. Source code, installation
 
 In addition this analysis has the following dependencies:
 
-* Python 2
+* Python 2.7
     - numpy
     - matplotlib
     - scipy
-    - pandas
-    - bx-python
     - biopython
     - scikit-learn
 * bedtools
-* 
+* samtools
+* meme
+
+These can all be installed via [`conda`](https://conda.io/docs/). Below is an example of how to set up an appropriate environment via Conda to run this analysis.
+
+
+## The Working Environment
+
+```
+WORKING_DIRECTORY="~/scratch/working_draft"
+
+cd $WORKING_DIRECTORY
+git clone https://github.com/pdeford/strum_paper.git
+cd strum_paper
+mkdir src
+cd src
+git clone https://github.com/pdeford/StructuralMotifs.git
+
+conda create -n strum_paper python=2.7
+source activate strum_paper
+conda install bedtools samtools meme \
+    matplotlib numpy scipy scikit-learn biopython
+cd StructuralMotifs
+python setup.py install
+cd ../..
+```
+
+## Running the Code
+
+Once your environment is initialize appropriately, all of the code can be produced using the command:
+
+```
+./do_all.sh $n_processes
+```
+
+where `$n_processes` is the number of processors that you have available to devote to the analysis.
