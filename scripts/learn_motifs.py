@@ -51,9 +51,9 @@ def learn(basename, n_process, random_seed):
 
 	# Train EM-StruM on first N_seq peaks from ChIP experiment
 	print >> sys.stderr, "Train EM StruM"
-	em_strum = strum.StruM(mode='groove', n_process=n_process)
+	em_strum = strum.StruM(mode='full', n_process=n_process)
 	em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
-		k=(k-1), max_iter=250, random_seed=random_seed)
+		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed)
 	em_strum.filter()
 
 	return (pwm, dwm, ml_strum, em_strum), sequences
