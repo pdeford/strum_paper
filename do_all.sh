@@ -73,8 +73,7 @@ do
 	bedtools getfasta -fi data/hg19.fa -bed $line -fo 'data/'$basename'.fa'
 
 	echo "Get flanking  sequences as negative control"
-	bedtools flank -r 1.0 -pct -i $line -g data/hg19sizes.genome |\
-		bedtools shift -i stding -g data/hg19sizes.genome -s 0.2 -pct > $line'.negative'
+	bedtools flank -l 0.0 -r 1.0 -pct -i $line -g data/hg19sizes.genome > $line'.negative'
 	bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 	echo -n "["$(date +"%F %T")"] "; echo "Run MEME"

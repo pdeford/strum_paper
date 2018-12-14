@@ -27,7 +27,7 @@ import overview_fig
 np.random.seed(1241)
 
 from Bio import motifs as biomotifs
-# from strum import strum
+from strum import strum
 
 ######################################################################
 # Load the data from all of the outputs                              #
