@@ -6,15 +6,15 @@ This analysis relies heavily on the **StruM package**. Source code, installation
 
 In addition this analysis has the following dependencies:
 
-* Python 2.7
-    - numpy
-    - matplotlib
-    - scipy
-    - biopython
-    - scikit-learn
-* bedtools
-* samtools
-* meme
+* (Python 2.7)[https://www.python.org/downloads/]
+    - (NumPy)[http://www.numpy.org/]
+    - (Matplotlib)[https://matplotlib.org/]
+    - (SciPy)[https://www.scipy.org/]
+    - (Biopython)[https://biopython.org/]
+    - (scikit-learn)[https://scikit-learn.org/stable/]
+* (bedtools)[https://bedtools.readthedocs.io/en/latest/]
+* (SAMtools)[http://www.htslib.org/]
+* (MEME suite)[http://meme-suite.org]
 
 These can all be installed via [`conda`](https://conda.io/docs/). Below is an example of how to set up an appropriate environment via Conda to run this analysis.
 
