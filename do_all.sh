@@ -22,8 +22,7 @@ rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.
 tar xvzf data/chromFa.tar.gz -C ./data
 cat data/chr*.fa > data/hg19.fa
 rm data/chr*.fa
-samtools faidx data/hg19.fa 
-cut -f1,2 data/hg19.fa.fai > data/hg19sizes.genome
+curl "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.chrom.sizes" > data/hg19sizes.genome
 
 # Download ChIP data for K562 cells
 python scripts/download_K562chip.py > data/accessions.txt
