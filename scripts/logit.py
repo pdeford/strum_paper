@@ -13,7 +13,8 @@ from multiprocessing import Pool
 from scipy import interp
 from sklearn.linear_model import LogisticRegression as logit
 from sklearn.metrics import roc_curve, auc
-from sklearn.cross_validation import StratifiedKFold
+# from sklearn.cross_validation import StratifiedKFold # Version 0.17.1
+from sklearn.model_selection import StratifiedKFold    # Version 0.20.1
 
 try:
 	import cPickle as pickle
@@ -101,11 +102,13 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 	## Train the model
 	clf = logit()
-	cv = StratifiedKFold(y,n_folds=10)
+	# cv = StratifiedKFold(y,n_folds=10)  # Version 0.17.1
+	cv = StratifiedKFold(n_splits=10)     # Version 0.20.1
 	tprs = []
 	aucs = []
 	mean_fpr = np.linspace(0, 1, 100)
-	for train, test in cv:
+	# for train, test in cv:              # Version 0.17.1
+	for train, test in cv.split(data, y): # Version 0.20.1
 		probas_ = clf.fit(data[train], y[train]).predict_proba(data[test])
 		# Compute ROC curve and area the curve
 		fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1])
