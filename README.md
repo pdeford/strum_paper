@@ -34,7 +34,8 @@ git clone https://github.com/pdeford/StructuralMotifs.git
 conda create -n strum_paper python=2.7
 source activate strum_paper
 conda install bedtools samtools meme \
-    matplotlib numpy scipy scikit-learn biopython
+    matplotlib numpy scipy scikit-learn=0.20.1 biopython \
+    requests libiconv
 cd StructuralMotifs
 python setup.py install
 cd ../..
