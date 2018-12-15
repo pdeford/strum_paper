@@ -27,7 +27,7 @@ def learn(basename, n_process, random_seed):
 	count = 0
 	sequences = []
 	for line in meme_output:
-		if "Motif 1 sites sorted by position p-value" in line:
+		if "1 sites sorted by position p-value" in line:
 			start = True
 		if start:
 			count += 1
