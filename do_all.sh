@@ -9,7 +9,7 @@
 n_process=$1
 
 # Prepare the environment
-source activate strum
+source activate strum_paper
 mkdir data figures output
 touch output/correlations.txt
 
