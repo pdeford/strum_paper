@@ -130,11 +130,14 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 	## Train the model
 	clf2 = logit()
-	cv2 = StratifiedKFold(working_y, n_folds=10)
+	# cv2 = StratifiedKFold(working_y, n_folds=10)      # Version 0.17.1
+	cv2 = StratifiedKFold(n_splits=10)                  # Version 0.20.1
+
 	tprs = []
 	aucs = []
 	mean_fpr = np.linspace(0, 1, 100)
-	for train, test in cv2:
+	# for train, test in cv2:                           # Version 0.17.1
+	for train, test in cv2.split(working_x, working_y): # Version 0.20.1
 		probas_ = clf2.fit(working_x[train], working_y[train]).predict_proba(working_x[test])
 		# Compute ROC curve and area the curve
 		fpr, tpr, thresholds = roc_curve(working_y[test], probas_[:, 1])
