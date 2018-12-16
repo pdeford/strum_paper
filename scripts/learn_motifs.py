@@ -51,9 +51,27 @@ def learn(basename, n_process, random_seed):
 
 	# Train EM-StruM on first N_seq peaks from ChIP experiment
 	print >> sys.stderr, "Train EM StruM"
+	prelim_em_strum = strum.StruM(mode='proteingroove', n_process=n_process)
+	prelim_em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
+		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed, 
+		background='compute')
+	prelim_kmers = []
+	for seq in sequences[:N_seq]:
+		rseq = prelim_em_strum.rev_comp(seq)
+		s1 = prelim_em_strum.score_seq(seq)
+		s2 = prelim_em_strum.score_seq(rseq)
+		if np.max(s1) > np.max(s2):
+			i = np.argmax(s1)
+		else:
+			seq = rseq
+			i = np.argmax(s2)
+		prelim_kmers.append(seq[i:i+k])
+
 	em_strum = strum.StruM(mode='full', n_process=n_process)
+	em_strum.train(prelim_kmers)
 	em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
-		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed)
+		max_iter=250, random_seed=random_seed,
+		background='compute', seed_motif=em_strum.strum)
 	em_strum.filter()
 
 	return (pwm, dwm, ml_strum, em_strum), sequences
@@ -109,7 +127,7 @@ def fasta_reader(file_obj):
 def learn_strum(sequences):
 	"""Generate a StruM from a set of training sequences."""
 	"""StruM = Structural Motif"""
-	motif = strum.StruM(mode='groove')
+	motif = strum.StruM(mode='full')
 	motif.train(sequences, lim=0.001)
 	return motif
 
