@@ -53,8 +53,7 @@ def learn(basename, n_process, random_seed):
 	print >> sys.stderr, "Train EM StruM"
 	prelim_em_strum = strum.StruM(mode='proteingroove', n_process=n_process)
 	prelim_em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
-		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed, 
-		background='compute')
+		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed,)
 	prelim_kmers = []
 	for seq in sequences[:N_seq]:
 		rseq = prelim_em_strum.rev_comp(seq)
@@ -70,8 +69,7 @@ def learn(basename, n_process, random_seed):
 	em_strum = strum.StruM(mode='full', n_process=n_process)
 	em_strum.train(prelim_kmers)
 	em_strum.train_EM(sequences[:N_seq], fasta=False, lim=0.001, 
-		max_iter=250, random_seed=random_seed,
-		background='compute', seed_motif=em_strum.strum)
+		max_iter=250, random_seed=random_seed, seed_motif=em_strum.strum)
 	em_strum.filter()
 
 	return (pwm, dwm, ml_strum, em_strum), sequences
