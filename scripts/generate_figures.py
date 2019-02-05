@@ -487,18 +487,18 @@ plt.hist(avgdist_data)
 
 # Correlated
 ax_b = plt.subplot(4,1,2)
-cor_img = mpl.image.imread("output/" + "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
+cor_img = mpl.image.imread("output/" + "ARHGAP35.ENCFF991AML" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
 							+ "_fimo_v_strum_matches.png")
-ax_b.set_title("GTF2E2", loc='left')
+ax_b.set_title("ARHGAP35", loc='left')
 ax_b.imshow(cor_img)
 ax_b.xaxis.set_visible(False)
 ax_b.yaxis.set_visible(False)
 
 # Anti Correlated
 ax_c = plt.subplot(4,1,3)
-anticor_img = mpl.image.imread("output/eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
+anticor_img = mpl.image.imread("output/" + "HNRNPK.ENCFF936IJD" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
 								+ "_fimo_v_strum_matches.png")
-ax_c.set_title("ZNF512", loc='left')
+ax_c.set_title("HNRNPK", loc='left')
 ax_c.imshow(anticor_img)
 ax_c.xaxis.set_visible(False)
 ax_c.yaxis.set_visible(False)
@@ -506,9 +506,9 @@ ax_c.yaxis.set_visible(False)
 
 # Not Correlated
 ax_d = plt.subplot(4,1,4)
-rand_img = mpl.image.imread("output/ATF2.ENCFF525YRJ" # ATF4.ENCFF491DNM
+rand_img = mpl.image.imread("output/" + "SMC3.ENCFF483CZB" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
 							+ "_fimo_v_strum_matches.png")
-ax_d.set_title("ATF2", loc='left')
+ax_d.set_title("SMC3", loc='left')
 ax_d.imshow(rand_img)
 # ax_d.xaxis.set_visible(False)
 ax_d.yaxis.set_visible(False)
@@ -532,11 +532,47 @@ for g in pknonpk_genes:
 		R.append(corr[g])
 fig5 = plt.figure(figsize=[onecol, onecol])
 label_plots(fig5, 1, 1)
-ax_a = plt.subplot(1,1,1)
-ax_a.scatter(R, shuff_AUCs[:,4], c=log_pwm)
-ax_a.colorbar()
-ax_a.set_xlabel("Pearson Correlation between PWM and StruM scores.")
-ax_a.set_ylabel("AUC of Logistic Regression Model.")
+#ax_a = plt.subplot(1,1,1)
+left = 0.17
+bottom = 0.2
+ax_a = fig5.add_axes((left,bottom,0.98-left,0.8-bottom))
+ax_pos = ax_a.get_position().bounds
+cax = fig5.add_axes((ax_pos[0],ax_pos[1]+ax_pos[3]+0.08,ax_pos[2],0.04))
+cax.set_title("$\\Delta$ AUC (logit-PWM)", size=10)
+#scat5 = ax_a.scatter(R, shuff_AUCs[:,4], c=log_pwm)
+scat5 = ax_a.scatter(x=R, c=log_pwm, y=shuff_AUCs[:,4], s=10)
+fig5.colorbar(scat5, cax=cax, orientation='horizontal')
+ax_a.set_xlabel("|Pearson Correlation|\nbetween PWM and StruM scores")
+ax_a.set_ylabel("AUC of Combined Model")
 
 fig5.savefig('figures/figure5.pdf')
 
+fig5 = plt.figure(figsize=[onecol, onecol])
+label_plots(fig5, 1, 1)
+x = R
+y = log_pwm
+ax_a = fig5.add_axes((left, bottom, 0.8-left, 0.8-bottom))
+ax_pos = ax_a.get_position().bounds
+ax_top = fig5.add_axes((left, 0.8, ax_pos[2], 0.2), sharex=ax_a)
+ax_right = fig5.add_axes((0.8, bottom, 0.2, ax_pos[3]), sharey=ax_a)
+ax_a.scatter(x, y, s=5, c='k')
+ax_a.set_xlabel("Correlation between scores")
+ax_a.set_ylabel("$\\Delta$ AUC (logit-PWM)")
+ax_top.hist(x, bins=30, facecolor='grey')
+ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
+ax_top.axis('off')
+ax_right.axis('off')
+z = np.polyfit(x, y, 1)
+p = np.poly1d(z)
+minx = min(x)
+maxx = max(x)
+ax_a.plot([minx,maxx],p([minx,maxx]), c=colors[0], lw=2)
+fig5.savefig('figures/figure5b.pdf')
+
+print """
+############################################
+# CORRELATION BETWEEN PWM AND STRUM SCORES #
+############################################
+"""
+print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
+print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
