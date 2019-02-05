@@ -11,6 +11,7 @@ import subprocess
 # plt.style.use("dark_background")
 
 from multiprocessing import Pool
+from scipy.stats import pointbiserialr
 
 try:
         import cPickle as pickle
@@ -37,13 +38,13 @@ def main(basename, n_process=1):
 
 	k = pwm.shape[1]
 
-	f = open("output/{}_meme/fimo_out_1/fimo.txt".format(basename))
+	f = open("output/{}_meme/fimo_out_2/fimo.txt".format(basename))
 	f.readline()
 	matches = {}
 	for line in f:
 		fields = line.split()
-		chrom = fields[1]
-		start = int(fields[2])
+		chrom = fields[2]
+		start = int(fields[3])
 		matches.setdefault(chrom, []).append(start)
 
 	if sum([len(matches[chrom]) for chrom in matches]) < 100:
@@ -58,7 +59,7 @@ def main(basename, n_process=1):
 		matchlist = matches[chrom]
 		tmp = [matchlist[0]]
 		for i in range(1, len(matchlist)):
-			if matchlist[i] - matchlist[i-1] < 50:
+			if matchlist[i] - matchlist[i-1] < 10:
 				tmp.append(matchlist[i])
 			else:
 				regions.setdefault(chrom, []).append(int(np.average(tmp)))
@@ -72,7 +73,7 @@ def main(basename, n_process=1):
 				start = pos - 100
 				if start < 0:
 					continue
-				f.write("{}\t{}\t{}\n".format(chrom, start, pos+100))
+				f.write("{}\t{}\t{}\n".format(chrom, start, pos+100+k))
 
 	subprocess.call(
 		"bedtools getfasta -fi data/hg19.fa -bed {} -fo 'data/{}_matches.fa'".format(
@@ -93,11 +94,12 @@ def main(basename, n_process=1):
 
 	scores = np.vstack(scores)
 
+	# BINARIZE THE STRUM SCORES
 	for thresh in np.sort(scores.ravel())[::-1]:
 		count = np.sum(scores > thresh)
 		if count > n:
 			break
-
+	
 	bin_scores = np.zeros(scores.shape)
 	bin_scores[scores > thresh] = 1
 
@@ -120,6 +122,15 @@ def main(basename, n_process=1):
 					fimo_mat[i, j] = 1
 			i += 1
 
+	# SORT THE MATRICES FOR THE HEATMAP
+	corrs = []
+	for i in range(fimo_mat.shape[0]):
+		r,p = pointbiserialr(fimo_mat[i], scores[i])
+		corrs.append(r)
+	sort_idx = np.argsort(corrs)
+	fimo_mat = fimo_mat[sort_idx]
+	scores = scores[sort_idx]
+	bin_scores = bin_scores[sort_idx]
 
 	# for i,r in enumerate(regions):
 	# 	left = r - 100
@@ -145,7 +156,8 @@ def main(basename, n_process=1):
 	plt.yticks([])
 	plt.xticks([])
 	plt.subplot(122)
-	plt.pcolor(bin_scores, cmap='YlGnBu')
+	#plt.pcolor(bin_scores, cmap='YlGnBu')
+	plt.pcolor(scores, cmap='YlGnBu')
 	plt.axis('tight')
 	# plt.xticks([0, 49, 99, 149, 199], [-100, -50, 0, 50, 100])
 	# plt.xlabel("Position (bp)")
@@ -159,10 +171,7 @@ def main(basename, n_process=1):
 	for i, row in enumerate(bin_scores):
 		row2 = fimo_mat[i]
 		for m1 in np.where(row == 1)[0]:
-			delta = []
-			for m2 in np.where(row2 == 1)[0]:
-				d = abs(m2-m1)
-				delta.append(d)
+			delta = np.absolute(m1 - np.where(row2 == 1)[0])
 			diffs.append(min(delta))
 
 	plt.figure()
@@ -173,7 +182,7 @@ def main(basename, n_process=1):
 	plt.savefig("output/{}_fimo_v_strum_dist.pdf".format(basename))
 	plt.close()
 
-	print basename, n, k, np.average(diffs)
+	print basename, n, k, np.average(diffs), np.std(diffs)
 
 
 # Define Functions
@@ -215,9 +224,11 @@ def eval_seq(seq):
 	em_strum_scores = []
 	for j in range(len(seq) - k + 1):
 		kmer = seq[j:j+k]
-		if 'N' in kmer: continue
-		rkmer = rev_comp(kmer)
-		em_strum_scores.append(max(score_StruM(em_strum, kmer), score_StruM(em_strum, rkmer)))
+		if 'N' in kmer: 
+			em_strum_scores.append(np.nan) 
+		else:
+			rkmer = rev_comp(kmer)
+			em_strum_scores.append(max(score_StruM(em_strum, kmer), score_StruM(em_strum, rkmer)))
 	if len(em_strum_scores) < 200:
 		em_strum_scores += [-1e10]*(200-len(em_strum_scores))
 	return em_strum_scores
