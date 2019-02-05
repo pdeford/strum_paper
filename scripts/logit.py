@@ -130,7 +130,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
 		tprs[-1][0] = 0.0
 		precisions[-1][-1] = 0.0
 		roc_auc = auc(fpr, tpr)
-		precisions[-1][-1] = 0.0
+		prcauc = auc(recall, precision)
 		aucs.append(roc_auc)
 		prcaucs.append(prcauc)
 	mean_tpr = np.mean(tprs, axis=0)
@@ -167,7 +167,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
 		tprs[-1][0] = 0.0
 		precisions[-1][-1] = 0.0
 		roc_auc = auc(fpr, tpr)
-		precisions[-1][-1] = 0.0
+		prcauc = auc(recall, precision)
 		aucs.append(roc_auc)
 		prcaucs.append(prcauc)
 	mean_tpr = np.mean(tprs, axis=0)
