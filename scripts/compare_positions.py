@@ -10,7 +10,6 @@ import sys
 import subprocess
 # plt.style.use("dark_background")
 
-from multiprocessing import Pool
 from scipy.stats import pointbiserialr
 
 try:
