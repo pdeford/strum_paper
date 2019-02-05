@@ -67,7 +67,7 @@ def learn(basename, n_process, random_seed):
 		prelim_kmers.append(seq[i:i+k])
 
 	em_strum = strum.StruM(mode='full', n_process=n_process)
-	em_strum.train(prelim_kmers)
+	em_strum.train(prelim_kmers, lim=0.001)
 	em_strum.filter()
 
 	return (pwm, dwm, ml_strum, em_strum), sequences
