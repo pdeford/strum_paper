@@ -24,18 +24,21 @@ def main(tf):
 	pwm, dwm, ml_strum, em_strum, logit, logit2 = pickle.load(open("output/{}.p".format(tf), "rb"))
 
 	k = pwm.shape[1]
-	sequences = ["".join([random.choice(nucs) for i in range(k)]) for i in range(N)]
+	sequence = "".join([random.choice(nucs) for i in range(N+k)])
+	sequences = [sequence[i:i+k] for i in range(N)]
 
 	scores = []
 	for kmer in sequences:
 		s1 = score_PWM(pwm, kmer)
 		s2 = score_DWM(dwm, kmer)
-		s3 = score_StruM(ml_strum, kmer)
-		s4 = score_StruM(em_strum, kmer)
-		scores.append((s1, s2, s3, s4))
+		scores.append((s1, s2))
+	s3 = ml_strum.score_seq_filt(sequence)
+	s4 = em_strum.score_seq_filt(sequence)
+	
 
-	scores = np.vstack(scores)
-	coef = np.corrcoef(scores.T)
+	scores = np.vstack(scores).T
+	scores = np.vstack([scores, s3, s4])
+	coef = np.corrcoef(scores)
 
 	idx = np.triu_indices(4, 1)
 	print "{}\t".format(tf) + "\t".join(["{:0.3f}".format(x) for x in coef[idx]])

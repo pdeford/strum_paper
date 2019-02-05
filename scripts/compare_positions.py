@@ -38,7 +38,7 @@ def main(basename, n_process=1):
 
 	k = pwm.shape[1]
 
-	f = open("output/{}_meme/fimo_out_2/fimo.txt".format(basename))
+	f = open("output/{}_meme/fimo_out_1/fimo.txt".format(basename))
 	f.readline()
 	matches = {}
 	for line in f:
