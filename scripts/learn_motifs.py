@@ -56,7 +56,7 @@ def learn(basename, n_process, random_seed):
 		k=(k-1), max_iter=250, n_init=5, random_seed=random_seed,)
 	prelim_kmers = []
 	for seq in sequences[:N_seq]:
-		rseq = prelim_em_strum.rev_comp(seq)
+		rseq = strum.rev_comp(seq)
 		s1 = prelim_em_strum.score_seq(seq)
 		s2 = prelim_em_strum.score_seq(rseq)
 		if np.max(s1) > np.max(s2):

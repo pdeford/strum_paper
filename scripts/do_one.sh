@@ -18,18 +18,10 @@ suffix=${fname##*.K562.}
 accession=${suffix%.*}
 
 basename=$tf'.'$accession
+echo -n "["$(date +"%F %T")"] "; echo $basename
 
 # Set random seed for reproducibility
 seed=$(python scripts/accession2seed.py $accession)
-
-# Check if this iteration has already been done. If so,
-##continue to the next one. (Allows several versions to
-##run simultaneously.)
-if [ -e 'data/'$basename'.fa' ]; then
-	continue
-fi
-
-echo -n "["$(date +"%F %T")"] "; echo $basename
 
 # Extract 100bp around the summit
 sort -k7,7nr $line | awk 'BEGIN{OFS="\t"}{a=($10+$2); print $1, a-50, a+50}' > 'data/'$basename'centered.bed'
