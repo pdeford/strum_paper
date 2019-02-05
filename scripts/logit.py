@@ -71,8 +71,6 @@ def score_all(basename, n_process, random_seed, models, sequences):
 	data = data[mask]
 	y = y[mask]
 	print >> sys.stderr, "Skipping {} sequences due to `nan` or `inf`".format(np.sum(~mask))
-	print >> sys.stderr, np.sum(np.isnan(data), axis=0)
-	print >> sys.stderr, np.sum(np.isinf(data), axis=0)
 
 	print >> sys.stderr, "Get ROC curves"
 	# Evaluate the performance of each motif
