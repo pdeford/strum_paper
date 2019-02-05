@@ -20,11 +20,12 @@ nuc_index = dict(zip(nucs, range(4)))
 dimers = [a+b for a in nucs for b in nucs]
 di_index = dict(zip(dimers, range(16)))
 
-def main(tf):
+def main(tf, seed):
+	random.seed(seed)
 	pwm, dwm, ml_strum, em_strum, logit, logit2 = pickle.load(open("output/{}.p".format(tf), "rb"))
 
 	k = pwm.shape[1]
-	sequence = "".join([random.choice(nucs) for i in range(N+k)])
+	sequence = "".join([random.choice(nucs) for i in range(N+k-1)])
 	sequences = [sequence[i:i+k] for i in range(N)]
 
 	scores = []
@@ -35,7 +36,6 @@ def main(tf):
 	s3 = ml_strum.score_seq_filt(sequence)
 	s4 = em_strum.score_seq_filt(sequence)
 	
-
 	scores = np.vstack(scores).T
 	scores = np.vstack([scores, np.reshape(s3, [1,-1]), np.reshape(s4, [1,-1])])
 	coef = np.corrcoef(scores)
@@ -68,4 +68,5 @@ def score_StruM(strum, kmer):
 
 if __name__ == '__main__':
 	tf = sys.argv[1]
-	main(tf)
+	seed = sys.argv[2]
+	main(tf, seed)
