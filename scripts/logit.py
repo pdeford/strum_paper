@@ -63,8 +63,8 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 	data = np.vstack(data)	
 	y = np.array(y, dtype=int)
-	print >> sys.stderr, data
-	print >> sys.stderr, y
+	print >> sys.stderr, np.sum(np.isnan(data), axis=0)
+	print >> sys.stderr, np.sum(np.isinf(data), axis=0)
 
 	print >> sys.stderr, "Get ROC curves"
 	# Evaluate the performance of each motif
