@@ -63,6 +63,14 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 	data = np.vstack(data)	
 	y = np.array(y, dtype=int)
+
+	# Filter out bad sequences
+	bad_rows = np.where(np.isnan(data) | np.isinf(data))[0]
+	mask = np.ones(data.shape[0], dtype=bool)
+	mask[bad_rows] = False
+	data = data[mask]
+	y = y[mask]
+	print >> sys.stderr, "Skipping {} sequences due to `nan` or `inf`".format(np.sum(~mask))
 	print >> sys.stderr, np.sum(np.isnan(data), axis=0)
 	print >> sys.stderr, np.sum(np.isinf(data), axis=0)
 
