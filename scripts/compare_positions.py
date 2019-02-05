@@ -188,7 +188,7 @@ def main(basename, n_process=1):
 # Define Functions
 def score_StruM(strum, kmer):
 	"""Score a kmer with a given StruM, and return log10 of the score."""
-	return strum.eval(strum.translate(kmer))
+	return strum.score_seq_filt(kmer)[0]
 
 def rev_comp(seq):
 	"""Return the reverse complement of a nucleotide sequence."""

@@ -37,7 +37,7 @@ def main(tf):
 	
 
 	scores = np.vstack(scores).T
-	scores = np.vstack([scores, s3, s4])
+	scores = np.vstack([scores, np.reshape(s3, [1,-1]), np.reshape(s4, [1,-1])])
 	coef = np.corrcoef(scores)
 
 	idx = np.triu_indices(4, 1)
