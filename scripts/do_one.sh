@@ -36,7 +36,8 @@ bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.f
 
 echo -n "["$(date +"%F %T")"] "; echo "Run MEME"
 meme-chip -oc 'output/'$basename'_meme' -dna -nmeme 500 -seed $seed -noecho \
-  -norand -meme-nmotifs 1 -dreme-m 0 -spamo-skip 'data/'$basename'.fa'
+  -norand -meme-p $n_process -meme-nmotifs 1 -dreme-m 0 -spamo-skip \
+  'data/'$basename'.fa'
 
 # Learn each of the motifs: PWM, DWM, ML-StruM, EM-StruM
 echo -n "["$(date +"%F %T")"] "; echo "Learn motifs and score seqs"
