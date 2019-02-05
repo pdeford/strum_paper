@@ -3,3 +3,4 @@ slurm-*
 data/*
 job_sub.sh
 output/*
+.DS_Store
