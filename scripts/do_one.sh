@@ -48,5 +48,5 @@ echo -n "["$(date +"%F %T")"] "; echo "Report coefficients of logit model"
 echo -n "["$(date +"%F %T")"] "; echo "Compare positioning of most significant matches"
 ./scripts/compare_positions.py $basename $n_process >> output/position_comp.txt
 
-echo "Get correlation between motif scores"
+echo -n "["$(date +"%F %T")"] "; echo "Get correlation between motif scores"
 ./scripts/correlation.py $basename >> output/correlations.txt
