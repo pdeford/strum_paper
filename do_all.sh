@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-:'
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Execute this file with the first argument being !
-! the number of cores available to be used.       !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-'
+
+# Check command line arguments
+if [[ $# -ne 1 ]]; then
+    echo "ERROR: Illegal number of parameters:" $#
+    echo "Usage:"
+    echo "    ${0} n_process"
+    exit 5
+fi
 
 n_process=$1
 
@@ -41,6 +43,20 @@ touch output/correlations.txt
 # Loop over each of the ChIP files
 ls data/*K562*bed | while read line;
 do
+	fname=${line##*/}
+	tf=${fname%%.*}
+	suffix=${fname##*.K562.}
+	accession=${suffix%.*}
+
+	basename=$tf'.'$accession
+
+	# Check if this iteration has already been done. If so,
+	##continue to the next one. (Allows several versions to
+	##run simultaneously.)
+	if [ -e 'data/'$basename'.fa' ]; then
+		continue
+	fi
+
 	bash scripts/do_one.sh $n_process $line
 done
 
