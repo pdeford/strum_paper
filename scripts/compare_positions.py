@@ -87,11 +87,9 @@ def main(basename, n_process=1):
 	####SCORE THE SEQUENCES WITH STRUM
 	####FILTER FOR `n` TOP SITES
 	####LOOK AT POSITIONS RELATIVE TO FIMO POSITIONS
-	pool = Pool(n_process)
-	scores = pool.map(eval_seq, sequences)
-	pool.close()
-	pool.join()
-
+	scores = []
+	for seq in sequences:
+		scores.append(eval_seq(seq))
 	scores = np.vstack(scores)
 
 	# BINARIZE THE STRUM SCORES
@@ -186,10 +184,6 @@ def main(basename, n_process=1):
 
 
 # Define Functions
-def score_StruM(strum, kmer):
-	"""Score a kmer with a given StruM, and return log10 of the score."""
-	return strum.score_seq_filt(kmer)[0]
-
 def rev_comp(seq):
 	"""Return the reverse complement of a nucleotide sequence."""
 	nucs = "ACNGT"
@@ -221,16 +215,9 @@ def fasta_reader(file_obj):
 	return headers[:-1], sequences
 
 def eval_seq(seq):
-	em_strum_scores = []
-	for j in range(len(seq) - k + 1):
-		kmer = seq[j:j+k]
-		if 'N' in kmer: 
-			em_strum_scores.append(np.nan) 
-		else:
-			rkmer = rev_comp(kmer)
-			em_strum_scores.append(max(score_StruM(em_strum, kmer), score_StruM(em_strum, rkmer)))
-	if len(em_strum_scores) < 200:
-		em_strum_scores += [-1e10]*(200-len(em_strum_scores))
+	em_strum_scores_f = em_strum.score_seq_filt(seq)
+	em_strum_scores_r = em_strum.score_seq_filt(rev_comp(seq))[::-1]
+	em_strum_scores = np.max(np.vstack([em_strum_scores_f, em_strum_scores_r]), axis=0)
 	return em_strum_scores
 
 if __name__ == '__main__':
