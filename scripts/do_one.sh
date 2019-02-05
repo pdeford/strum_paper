@@ -49,4 +49,4 @@ echo -n "["$(date +"%F %T")"] "; echo "Compare positioning of most significant m
 ./scripts/compare_positions.py $basename $n_process >> output/position_comp.txt
 
 echo -n "["$(date +"%F %T")"] "; echo "Get correlation between motif scores"
-./scripts/correlation.py $basename >> output/correlations.txt
+./scripts/correlation.py $basename $seed >> output/correlations.txt
