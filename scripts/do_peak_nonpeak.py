@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
+import matplotlib as mpl
+mpl.use("Agg")
 import sys
 
 try:
 	import cPickle as pickle
 except:
 	import pickle
+
 
 import learn_motifs
 import logit
