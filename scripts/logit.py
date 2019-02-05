@@ -257,10 +257,6 @@ def score_dwm(DWM, kmer):
 	#return np.log(p/np.product([0.25]*PWM.shape[1]))
 	return np.log2(p)
 
-def score_strum(strum, kmer):
-	"""Score a kmer with a given StruM, and return log10 of the score."""
-	return strum.eval_filt(strum.translate(kmer))
-
 def rev_comp(seq):
 	"""Return the reverse complement of a nucleotide sequence."""
 	nucs = "ACNGT"
@@ -301,11 +297,13 @@ def eval_seq(seq):
 			pwm_scores.append(score_pwm(pwm, rkmer))
 			dwm_scores.append(score_dwm(dwm, kmer))
 			dwm_scores.append(score_dwm(dwm, rkmer))
-			ml_strum_scores.append(score_strum(ml_strum, kmer))
-			ml_strum_scores.append(score_strum(ml_strum, rkmer))
-			em_strum_scores.append(score_strum(em_strum, kmer))
-			em_strum_scores.append(score_strum(em_strum, rkmer))
-		return (np.max(pwm_scores), np.max(dwm_scores), np.max(ml_strum_scores), np.max(em_strum_scores))
+		ml_strum_scores.append(ml_strum.score_seq_filt(seq))
+		ml_strum_scores.append(ml_strum.score_seq_filt(rev_comp(seq)))
+		em_strum_scores.append(em_strum.score_seq_filt(seq))
+		em_strum_scores.append(em_strum.score_seq_filt(rev_comp(seq)))
+		return (np.max(pwm_scores), np.max(dwm_scores), 
+			    np.max(np.hstack(ml_strum_scores)), 
+			    np.max(np.hstack(em_strum_scores)))
 
 if __name__ == '__main__':
 	basename = sys.argv[1]
