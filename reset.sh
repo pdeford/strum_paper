@@ -10,6 +10,8 @@ if (( $response != "y" )); then
 	exit
 fi
 
+git pull
+
 rm *.log
 rm -r output/
 rm data/*.ENCFF*.fa
