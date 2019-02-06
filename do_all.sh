@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# To track output and stderr:
+##./do_all.sh 80 > >(tee -a stdout.log) 2> >(tee -a stderr.log >&2)
+
 # Check command line arguments
 if [[ $# -ne 1 ]]; then
     echo "ERROR: Illegal number of parameters:" $#

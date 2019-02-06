@@ -41,7 +41,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
 	N_seq = 500
 	print >> sys.stderr, "Load positive and negative sequences"
 	# Get positive examples from file
-	peaks = sequences[N_seq:]
+	peaks = sequences[N_seq:2*N_seq]
 
 	# Create background sequences for classification from ChIP sequences
 	decoys = [list(p) for p in peaks]
