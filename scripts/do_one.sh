@@ -22,16 +22,22 @@ echo -n "["$(date +"%F %T")"] "; echo $basename
 
 # Set random seed for reproducibility
 seed=$(python scripts/accession2seed.py $accession)
+echo -n "["$(date +"%F %T")"] "; echo "Random seed:" $seed
+
+# Sort on the signal value, from largest to smallest
+echo -n "["$(date +"%F %T")"] "; echo "Sorting input"
+sort -k7,7nr $line > $line'.sorted'
 
 # Extract 100bp around the summit
-sort -k7,7nr $line | awk 'BEGIN{OFS="\t"}{a=($10+$2); print $1, a-50, a+50}' > 'data/'$basename'centered.bed'
+echo -n "["$(date +"%F %T")"] "; echo "Find peak centers"
+awk 'BEGIN{OFS="\t"}{a=($10+$2); print $1, a-50, a+50}' $line'.sorted' > 'data/'$basename'centered.bed'
 
 # Prepare sequence data: Extract peaks and flanking sequences, run MEME
 echo -n "["$(date +"%F %T")"] "; echo "Extract sequence for ChIP peaks"
 bedtools getfasta -fi data/hg19.fa -bed 'data/'$basename'centered.bed' -fo 'data/'$basename'.fa'
 
 echo "Get flanking  sequences as negative control"
-bedtools flank -l 0.0 -r 1.0 -pct -i $line -g data/hg19sizes.genome > $line'.negative'
+bedtools flank -l 0.0 -r 1.0 -pct -i $line -g data/hg19sizes.genome | head -n1000 > $line'.negative'
 bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 echo -n "["$(date +"%F %T")"] "; echo "Run MEME"
