@@ -37,7 +37,7 @@ echo -n "["$(date +"%F %T")"] "; echo "Extract sequence for ChIP peaks"
 bedtools getfasta -fi data/hg19.fa -bed 'data/'$basename'centered.bed' -fo 'data/'$basename'.fa'
 
 echo "Get flanking  sequences as negative control"
-bedtools flank -l 0.0 -r 1.0 -pct -i $line -g data/hg19sizes.genome | head -n1000 > $line'.negative'
+bedtools flank -l 0.0 -r 1.0 -pct -i $line'.sorted' -g data/hg19sizes.genome | head -n1000 > $line'.negative'
 bedtools getfasta -fi data/hg19.fa -bed $line'.negative' -fo 'data/'$basename'.flank.fa'
 
 echo -n "["$(date +"%F %T")"] "; echo "Run MEME"
