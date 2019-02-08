@@ -54,6 +54,7 @@ args = parser.parse_args()
 f = args.auc
 pknonpk_labels = ['PWM', 'DWM', 'ML-StruM', 'EM-StruM', 'Combined']
 shuff_AUCs, flank_AUCs, pknonpk_genes = [], [], []
+shuff_PRCs, flank_PRCs = [], []
 while True:
     l1 = f.readline()
     l2 = f.readline()
@@ -61,10 +62,14 @@ while True:
         break
     pknonpk_genes.append(l1.split()[0])
     shuff_AUCs.append([float(x) for x in l1.split()[1:6]])
+    shuff_PRCs.append([float(x) for x in l1.split()[6:11]])
     flank_AUCs.append([float(x) for x in l2.split()[1:6]])
+    flank_PRCs.append([float(x) for x in l2.split()[6:11]])
 
 shuff_AUCs = np.asarray(shuff_AUCs)
+shuff_PRCs = np.asarray(shuff_PRCs)
 flank_AUCs = np.asarray(flank_AUCs)
+flank_PRCs = np.asarray(flank_PRCs)
 
 ## Correlations of the scores between each PWMs and EM-StruMs
 corr = {}
@@ -148,7 +153,6 @@ def plot_box(data, labels, title=None):
 	plt.boxplot(data, notch=False, boxprops=props2, whiskerprops=props2, medianprops=props2, sym='')
 	plt.xticks(range(1, len(labels)+1), labels,)
 	plt.ylim([0,1])
-	plt.ylabel("AUC", weight='bold')
 	if title is not None:
 		plt.title(title,)
 
@@ -313,7 +317,7 @@ plt.subplots_adjust(left=0.01, bottom=0.05, right=0.99, top=0.95, hspace=0.2)
 plt.savefig('figures/figure2.pdf', dpi=600)
 
 ######################################################################
-# Figure 3: StruMs outperform, but are complementary to, PWMs        #
+# Figure 3: StruMs outperform, but are complementary to, PWMs (AUCs) #
 ######################################################################
 
 # props = {'color':'white', 'linestyle':'-', 'zorder':9, 'linewidth':3.5}
@@ -321,32 +325,77 @@ props2 = {'color':'black', 'linestyle':'-', 'zorder':10, 'linewidth':2}
 colors = ["darkorange", "#fb9a99", "seagreen", "steelblue", "mediumpurple"]
 markers = ['d', '^', 's', 'o', '*']
 
-fig3 = plt.figure(figsize=[2*twocol, 2*2/3.*twocol])
-label_plots(fig3, 2, 3)
+fig3 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
+plt.subplot(2,1,1)
+label_plots(fig3, 2, 2)
 
-# 3A) AUCs of motifs using shuffled sequence as background
-ax_a = plt.subplot(2,3,1)
+# 3A) auROCs of motifs using shuffled sequence as background
+ax_a = plt.subplot(2,2,1)
+plt.title("Shuffled background", weight='bold')
 plot_box(shuff_AUCs, pknonpk_labels)
+plt.ylabel("auROC", weight='bold')
+
 ## STATISTICS
-print_title("Difference in AUCs, shuffled background")
+print_title("Difference in auROCs, shuffled background")
 t_vals, p_vals = do_ttest(shuff_AUCs, pknonpk_labels)
 # box_sig_lines(p_vals, ax_a, shuff_AUCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_a)
 
-# 3B) AUCs of motifs using flanking sequence as background
-ax_b = plt.subplot(2,3,2)
+# 3B) auROCs of motifs using flanking sequence as background
+ax_b = plt.subplot(2,2,2)
+plt.title("Flanking background", weight='bold')
 plot_box(flank_AUCs, pknonpk_labels)
+plt.ylabel("auROC", weight='bold')
+
 ## STATISTICS
-print_title("Difference in AUCs, flanking seq as background")
+print_title("Difference in auROCs, flanking seq as background")
 t_vals, p_vals = do_ttest(flank_AUCs, pknonpk_labels)
 # box_sig_lines(p_vals, ax_b, flank_AUCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_b)
 
-# 3C) Logit coefficients sorted by improvement over PWM AUC
+# 3C) auPRCs of motifs using shuffled sequence as background
+ax_c = plt.subplot(2,2,3)
+plot_box(shuff_PRCs, pknonpk_labels)
+plt.ylabel("auPRC", weight='bold')
+
+## STATISTICS
+print_title("Difference in auPRCs, shuffled background")
+t_vals, p_vals = do_ttest(shuff_PRCs, pknonpk_labels)
+# box_sig_lines(p_vals, ax_c, shuff_PRCs)
+plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_c)
+
+# 3D) auPRCs of motifs using flanking sequence as background
+ax_d = plt.subplot(2,2,4)
+plot_box(flank_PRCs, pknonpk_labels)
+plt.ylabel("auPRC", weight='bold')
+
+## STATISTICS
+print_title("Difference in auPRCs, flanking seq as background")
+t_vals, p_vals = do_ttest(flank_PRCs, pknonpk_labels)
+# box_sig_lines(p_vals, ax_d, flank_PRCs)
+plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_d)
+
+plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.975,
+                wspace=0.2, hspace=0.2)
+
+for ax in [ax_a, ax_b, ax_c, ax_d,]:
+	ax.spines["top"].set_visible(False)
+	ax.spines["right"].set_visible(False)
+
+plt.savefig("figures/figure3.pdf")
+
+######################################################################
+# Figure 4: Readout mechanisms revealed by model                     #
+######################################################################
+
+fig4 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
+label_plots(fig4, 2, 2)
+
+# 4A) Logit coefficients sorted by improvement over PWM AUC
 pwm_auc = shuff_AUCs[:,0]
 strum_auc = shuff_AUCs[:,3]
 
-ax_c = plt.subplot(2,3,3)
+ax_a = plt.subplot(2,2,1)
 log_pwm = shuff_AUCs[:,4] - pwm_auc
 log_strum = shuff_AUCs[:,4] - strum_auc
 
@@ -370,19 +419,18 @@ plt.ylabel("Combined - StruM ($\Delta$ AUC)", weight='bold')
 # xmin = ymin = min(xmin, ymin)
 # plt.xlim([xmin, xmax])
 # plt.ylim([ymin, ymax])
-# ax_c.spines["top"].set_visible(False)
-# ax_c.spines["right"].set_visible(False)
+# ax_a.spines["top"].set_visible(False)
+# ax_a.spines["right"].set_visible(False)
 plt.axhline(0, c='k')
 plt.axvline(0, c='k')
-ax_c.yaxis.set_label_coords(-0.1,0.5)
+ax_a.yaxis.set_label_coords(-0.1,0.5)
 
 for side in ['top', 'right', 'left', 'bottom']:
-		ax_c.spines[side].set_visible(False)
+		ax_a.spines[side].set_visible(False)
 
 
-
-# 3D) Specificity of shape- vs base-readout TFs
-ax_d = plt.subplot(2,3,4)
+# 4B) Specificity of shape- vs base-readout TFs
+ax_b = plt.subplot(2,2,2)
 
 goi_seq = ['STAT', 'GATA']
 goi_shp = ['TBP', 'LEF', 'RFX',]
@@ -395,7 +443,7 @@ for subg in goi_seq:
 			g = g.split('.')[0]
 			if len(g) > len(subg) + 1: continue
 			roi_seq[i] = True
-			text.append((g, pwm_auc[i], strum_auc[i]))
+			text.append((i, g, pwm_auc[i], strum_auc[i]))
 roi_shp = np.zeros(pwm_auc.shape, dtype=bool)
 for subg in goi_shp:
 	for i, g in enumerate(pknonpk_genes):
@@ -403,7 +451,7 @@ for subg in goi_shp:
 			g = g.split('.')[0]
 			if len(g) > len(subg) + 1: continue
 			roi_shp[i] = True
-			text.append((g, pwm_auc[i], strum_auc[i]))
+			text.append((i, g, pwm_auc[i], strum_auc[i]))
 
 plt.plot(pwm_auc, strum_auc, '.', c='gray')
 plt.plot(pwm_auc[roi_seq], strum_auc[roi_seq], markers[0], 
@@ -412,50 +460,64 @@ plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[3],
 		 c=colors[3], ms=6, label='Shape Readout')
 plt.plot(plt.xlim(), plt.ylim(), '--', c='gray')
 
-for g,x,y in text:
+for i,g,x,y in text:
 	plt.text(x, y, g, dict(weight='bold'))
 
 plt.legend(loc='upper left')
 plt.xlabel("PWM auROC", weight='bold')
 plt.ylabel("EM-StruM auROC", weight='bold')
 
-# 3E) Complementarity of motifs in LOGIT model
-ax_e = plt.subplot(2,3,5)
+# 4C)  Logit coefficients sorted by improvement over PWM AUC
+ax_c = plt.subplot(2,2,3)
 
 plt.ylabel("logit coefficients", weight='bold')
-x = shuff_AUCs[:,-1] - shuff_AUCs[:,0]
+x = shuff_AUCs[:,4] - shuff_AUCs[:,0]
 idx = np.argsort(x)
 for i in [0,3]:#range(4):
 	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
 	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
+for i,g,xval,yval in text:
+	xval = np.where(idx==i)[0]
+	y1 = shuff_coeffs[i,0]
+	y2 = shuff_coeffs[i,3]
+	yt = (y1+y2)/2.
+	plt.plot([xval,xval], [y1,y2], 'k-')
+	plt.text(xval, yt, g, dict(weight='bold'))
 plt.legend(ncol=4, bbox_to_anchor=[0.0, 1], loc='upper left')
-ax_e2 = ax_e.twinx()
-ax_e2.tick_params('y', colors='r')
+ax_c2 = ax_c.twinx()
+ax_c2.tick_params('y', colors='r')
 plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
 plt.legend(loc='upper left', bbox_to_anchor=[0.0, 0.93])
-ax_e.set_xticks([])
-ax_e.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
-ax_e.yaxis.set_label_coords(-0.1,0.5)
-ax_e2.yaxis.set_label_coords(1.15,0.5)
+ax_c.set_xticks([])
+ax_c.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
+
+ax_c.yaxis.set_label_coords(-0.1,0.5)
+ax_c2.yaxis.set_label_coords(1.15,0.5)
 # plt.xlabel("Combined - PWM ($\Delta$ AUC)", weight='bold')
 
-# 3F) Logit coefficients sorted by improvement over PWM AUC
-ax_f = plt.subplot(2,3,6)
+# 4D) Logit coefficients sorted by improvement over StruM AUC
+ax_d = plt.subplot(2,2,4)
 # plt.ylabel("logit coefficients", weight='bold')
-x = shuff_AUCs[:,-1] - shuff_AUCs[:,3]
+x = shuff_AUCs[:,4] - shuff_AUCs[:,3]
 idx = np.argsort(x)
 for i in [0,3]:#range(4):
 	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
 	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
-
-ax_f2 = ax_f.twinx()
-# ax_f2.set_ylabel("Combined - StruM ($\Delta$ AUC)", color='r', weight='bold', rotation=270)
-ax_f2.tick_params('y', colors='r')
+for i,g,xval,yval in text:
+	xval = np.where(idx==i)[0]
+	y1 = shuff_coeffs[i,0]
+	y2 = shuff_coeffs[i,3]
+	yt = (y1+y2)/2.
+	plt.plot([xval,xval], [y1,y2], 'k-')
+	plt.text(xval, yt, g, dict(weight='bold'))
+ax_d2 = ax_d.twinx()
+# ax_d2.set_ylabel("Combined - StruM ($\Delta$ AUC)", color='r', weight='bold', rotation=270)
+ax_d2.tick_params('y', colors='r')
 plt.plot(x[idx], 'r-')
-ax_f.set_xticks([])
-ax_f.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
-ax_f.yaxis.set_label_coords(-0.1,0.5)
-ax_f2.yaxis.set_label_coords(1.15,0.5)
+ax_d.set_xticks([])
+ax_d.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
+ax_d.yaxis.set_label_coords(-0.1,0.5)
+ax_d2.yaxis.set_label_coords(1.15,0.5)
 
 # plt.legend(ncol=4, bbox_to_anchor=[0.5, 1], loc='upper center')
 # plt.xlabel("Combined - StruM ($\Delta$ AUC)", weight='bold')
@@ -463,15 +525,15 @@ ax_f2.yaxis.set_label_coords(1.15,0.5)
 plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.975,
                 wspace=0.2, hspace=0.2)
 
-for ax in [ax_a, ax_b, ax_c, ax_d, ax_e, ax_f ]:
+for ax in [ax_a, ax_b, ax_c, ax_d,]:
 	ax.spines["top"].set_visible(False)
 	ax.spines["right"].set_visible(False)
 
-plt.savefig("figures/figure3.pdf")
+plt.savefig("figures/figure4.pdf")
 
 
 ######################################################################
-# Figure 4: Distribution of significant StruM matches vs PWM matches #
+# Figure 5: Distribution of significant StruM matches vs PWM matches #
 ######################################################################
 
 fig4 = plt.figure(figsize=[2*onecol, 2*twocol])
@@ -515,32 +577,18 @@ ax_d.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Positi
 
 plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.975,
                 wspace=0.2, hspace=0.2)
-plt.savefig('figures/figure4.pdf')
+plt.savefig('figures/figure5.pdf')
 
 ################################################
-# Figure 5: Correlation between PWM and StruMs #
+# Figure 6: Correlation between PWM and StruMs #
 ################################################
 
 R = []
 for g in pknonpk_genes:
 	if g in corr:
 		R.append(corr[g])
-fig5 = plt.figure(figsize=[onecol, onecol])
-label_plots(fig5, 1, 1)
-#ax_a = plt.subplot(1,1,1)
 left = 0.17
 bottom = 0.2
-ax_a = fig5.add_axes((left,bottom,0.98-left,0.8-bottom))
-ax_pos = ax_a.get_position().bounds
-cax = fig5.add_axes((ax_pos[0],ax_pos[1]+ax_pos[3]+0.08,ax_pos[2],0.04))
-cax.set_title("$\\Delta$ AUC (logit-PWM)", size=10)
-#scat5 = ax_a.scatter(R, shuff_AUCs[:,4], c=log_pwm)
-scat5 = ax_a.scatter(x=R, c=log_pwm, y=shuff_AUCs[:,4], s=10)
-fig5.colorbar(scat5, cax=cax, orientation='horizontal')
-ax_a.set_xlabel("|Pearson Correlation|\nbetween PWM and StruM scores")
-ax_a.set_ylabel("AUC of Combined Model")
-
-fig5.savefig('figures/figure5.pdf')
 
 fig5 = plt.figure(figsize=[onecol, onecol])
 label_plots(fig5, 1, 1)
@@ -562,7 +610,7 @@ p = np.poly1d(z)
 minx = min(x)
 maxx = max(x)
 ax_a.plot([minx,maxx],p([minx,maxx]), c=colors[0], lw=2)
-fig5.savefig('figures/figure5b.pdf')
+fig5.savefig('figures/figure6.pdf')
 
 print """
 ############################################
