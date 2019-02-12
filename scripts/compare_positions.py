@@ -129,39 +129,28 @@ def main(basename, n_process=1):
 	scores = scores[sort_idx]
 	bin_scores = bin_scores[sort_idx]
 
-	# for i,r in enumerate(regions):
-	# 	left = r - 100
-	# 	if left < 0: 
-	# 		adjust += 1
-	# 		continue
-	# 	right = r + 100
-	# 	for pos in matches:
-	# 		if pos < left:
-	# 			continue
-	# 		elif pos >= right:
-	# 			break
-	# 		else:
-	# 			j = pos - left
-	# 			fimo_mat[i-adjust,j] = 1
+	fig = plt.figure(figsize=[12,6])
+	ax_leftbottom = fig.add_axes([0,0,0.495,0.85])
+	ax_lefttop = fig.add_axes([0,0.85,0.495,0.15], sharex=ax_leftbottom)
+	ax_rightbottom = fig.add_axes([0.505,0,0.495,0.85])
+	ax_righttop = fig.add_axes([0.505,0.85,0.495,0.15], sharex=ax_rightbottom)
 
-	plt.figure(figsize=[12,6])
-	plt.subplot(121)
-	plt.pcolor(fimo_mat, cmap='YlGnBu')
-	plt.axis('tight')
-	# plt.xticks([0, 49, 99, 149, 199], [-100, -50, 0, 50, 100])
-	# plt.xlabel("Position (bp)")
-	plt.yticks([])
-	plt.xticks([])
-	plt.subplot(122)
-	#plt.pcolor(bin_scores, cmap='YlGnBu')
-	plt.pcolor(scores, cmap='YlGnBu')
-	plt.axis('tight')
-	# plt.xticks([0, 49, 99, 149, 199], [-100, -50, 0, 50, 100])
-	# plt.xlabel("Position (bp)")
-	plt.yticks([])
-	plt.xticks([])
-	plt.subplots_adjust(left=0,bottom=0,top=1,right=1,wspace=0.01)
-	plt.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
+	ax_leftbottom.pcolor(fimo_mat, cmap='Blues')
+	ax_leftbottom.set_yticks([])
+	ax_leftbottom.set_xticks([])
+	ax_leftbottom.set_xlim([0,200])
+
+	ax_rightbottom.pcolor(scores, cmap='Blues')
+	ax_rightbottom.set_yticks([])
+	ax_rightbottom.set_xticks([])
+	ax_rightbottom.set_xlim([0,200])
+
+	ax_lefttop.plot(np.average(fimo_mat, axis=0))
+	ax_righttop.plot(np.average(scores, axis=0))
+	ax_lefttop.set_yticks([])
+	ax_righttop.set_yticks([])
+
+	fig.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
 	plt.close()
 
 	diffs = []
