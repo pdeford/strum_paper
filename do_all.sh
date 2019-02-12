@@ -66,7 +66,7 @@ done
 ####################################
 # Generate the figures from output #
 ####################################
-python overview_fig.py
+python scripts/overview_fig.py
 python scripts/generate_figures.py \
 	-a output/chip_auc.txt \
 	-r output/correlations.txt \
