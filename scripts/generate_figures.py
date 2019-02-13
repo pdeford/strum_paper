@@ -483,11 +483,11 @@ for i,g,xval,yval in text:
 	yt = (y1+y2)/2.
 	plt.plot([xval,xval], [y1,y2], 'k-')
 	plt.text(xval, yt, g, dict(weight='bold'))
-plt.legend(ncol=4, bbox_to_anchor=[0.0, 1], loc='upper left')
+plt.legend(ncol=4, bbox_to_anchor=[0.0, 0.93], loc='upper left')
 ax_c2 = ax_c.twinx()
 ax_c2.tick_params('y', colors='r')
 plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
-plt.legend(loc='upper left', bbox_to_anchor=[0.0, 0.93])
+plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
 ax_c.set_xticks([])
 ax_c.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
 
@@ -513,7 +513,8 @@ for i,g,xval,yval in text:
 ax_d2 = ax_d.twinx()
 # ax_d2.set_ylabel("Combined - StruM ($\Delta$ AUC)", color='r', weight='bold', rotation=270)
 ax_d2.tick_params('y', colors='r')
-plt.plot(x[idx], 'r-')
+plt.plot(x[idx], 'r-', label="Combined - StruM ($\Delta$ AUC)")
+plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
 ax_d.set_xticks([])
 ax_d.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
 ax_d.yaxis.set_label_coords(-0.1,0.5)
@@ -536,44 +537,53 @@ plt.savefig("figures/figure4.pdf")
 # Figure 5: Distribution of significant StruM matches vs PWM matches #
 ######################################################################
 
-fig4 = plt.figure(figsize=[2*onecol, 2*twocol])
-label_plots(fig4, 4, 1)
+fig4 = plt.figure(figsize=[2*onecol, 2.5*twocol])
+label_plots(fig4, 5, 1)
 
-ax_a = plt.subplot(4,1,1)
-plt.hist(avgdist_data)
+ax_a = plt.subplot(5,1,1)
+plt.hist(avgdist_data, bins=np.linspace(0,60,31))
 
 # Correlated
-ax_b = plt.subplot(4,1,2)
-cor_img = mpl.image.imread("output/" + "ARHGAP35.ENCFF991AML" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
+ax_b = plt.subplot(5,1,2)
+cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
 							+ "_fimo_v_strum_matches.png")
-ax_b.set_title("ARHGAP35", loc='left')
+ax_b.set_title("TAL1", loc='left')
 ax_b.imshow(cor_img)
 ax_b.xaxis.set_visible(False)
 ax_b.yaxis.set_visible(False)
 
-# Anti Correlated
-ax_c = plt.subplot(4,1,3)
-anticor_img = mpl.image.imread("output/" + "HNRNPK.ENCFF936IJD" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
+# Flanking
+ax_c = plt.subplot(5,1,3)
+flank_img = mpl.image.imread("output/" + "RFX1.ENCFF934JXG" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
 								+ "_fimo_v_strum_matches.png")
-ax_c.set_title("HNRNPK", loc='left')
-ax_c.imshow(anticor_img)
+ax_c.set_title("RFX1", loc='left')
+ax_c.imshow(flank_img)
 ax_c.xaxis.set_visible(False)
 ax_c.yaxis.set_visible(False)
 
 
-# Not Correlated
-ax_d = plt.subplot(4,1,4)
-rand_img = mpl.image.imread("output/" + "SMC3.ENCFF483CZB" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+# Anti Correlated
+ax_d = plt.subplot(5,1,4)
+anticor_img = mpl.image.imread("output/" + "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
 							+ "_fimo_v_strum_matches.png")
-ax_d.set_title("SMC3", loc='left')
-ax_d.imshow(rand_img)
-# ax_d.xaxis.set_visible(False)
+ax_d.set_title("RLF", loc='left')
+ax_d.imshow(anticor_img)
+ax_d.xaxis.set_visible(False)
 ax_d.yaxis.set_visible(False)
-xmin, xmax = ax_d.get_xlim()
+
+# Not Correlated
+ax_e = plt.subplot(5,1,5)
+rand_img = mpl.image.imread("output/" + "SNIP1.ENCFF772GVZ" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+							+ "_fimo_v_strum_matches.png")
+ax_e.set_title("SNIP1", loc='left')
+ax_e.imshow(rand_img)
+# ax_e.xaxis.set_visible(False)
+ax_e.yaxis.set_visible(False)
+xmin, xmax = ax_e.get_xlim()
 xticks = range(int(xmin), int(xmax+1), int((xmax-xmin)/4))
 xticks = np.linspace(xmin, xmax, 5)
-ax_d.set_xticks(xticks)
-ax_d.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
+ax_e.set_xticks(xticks)
+ax_e.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
 
 plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.975,
                 wspace=0.2, hspace=0.2)
@@ -587,7 +597,7 @@ R = []
 for g in pknonpk_genes:
 	if g in corr:
 		R.append(corr[g])
-left = 0.17
+left = 0.2
 bottom = 0.2
 
 fig5 = plt.figure(figsize=[onecol, onecol])
@@ -599,8 +609,8 @@ ax_pos = ax_a.get_position().bounds
 ax_top = fig5.add_axes((left, 0.8, ax_pos[2], 0.2), sharex=ax_a)
 ax_right = fig5.add_axes((0.8, bottom, 0.2, ax_pos[3]), sharey=ax_a)
 ax_a.scatter(x, y, s=5, c='k')
-ax_a.set_xlabel("Correlation between scores")
-ax_a.set_ylabel("$\\Delta$ AUC (logit-PWM)")
+ax_a.set_xlabel("Correlation between scores", weight='bold')
+ax_a.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
 ax_top.hist(x, bins=30, facecolor='grey')
 ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
 ax_top.axis('off')
