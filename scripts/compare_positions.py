@@ -92,13 +92,10 @@ def main(basename, n_process=1):
 	scores = np.vstack(scores)
 
 	# BINARIZE THE STRUM SCORES
-	for thresh in np.sort(scores.ravel())[::-1]:
+	for thresh in np.sort(np.unique(scores.ravel()))[::-1]:
 		count = np.sum(scores > thresh)
 		if count > n:
 			break
-	
-	bin_scores = np.zeros(scores.shape)
-	bin_scores[scores > thresh] = 1
 
 	fimo_mat = np.zeros(scores.shape)
 	adjust = 0
@@ -127,7 +124,6 @@ def main(basename, n_process=1):
 	sort_idx = np.argsort(corrs)
 	fimo_mat = fimo_mat[sort_idx]
 	scores = scores[sort_idx]
-	bin_scores = bin_scores[sort_idx]
 
 	fig = plt.figure(figsize=[12,6])
 	ax_leftbottom = fig.add_axes([0,0,0.495,0.85])
@@ -153,12 +149,38 @@ def main(basename, n_process=1):
 	fig.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
 	plt.close()
 
+	bin_scores = np.zeros(scores.shape)
 	diffs = []
-	for i, row in enumerate(bin_scores):
+	for i, row in enumerate(scores):
 		row2 = fimo_mat[i]
-		for m1 in np.where(row == 1)[0]:
-			delta = np.absolute(m1 - np.where(row2 == 1)[0])
-			diffs.append(min(delta))
+		m1 = np.argmax(row)
+		delta = np.absolute(m1 - np.where(row2 == 1)[0])
+		diffs.append(min(delta))
+		bin_scores[i,m1] = 1
+
+	fig = plt.figure(figsize=[12,6])
+	ax_leftbottom = fig.add_axes([0,0,0.495,0.85])
+	ax_lefttop = fig.add_axes([0,0.85,0.495,0.15], sharex=ax_leftbottom)
+	ax_rightbottom = fig.add_axes([0.505,0,0.495,0.85])
+	ax_righttop = fig.add_axes([0.505,0.85,0.495,0.15], sharex=ax_rightbottom)
+
+	ax_leftbottom.pcolor(fimo_mat, cmap='Blues')
+	ax_leftbottom.set_yticks([])
+	ax_leftbottom.set_xticks([])
+	ax_leftbottom.set_xlim([0,200])
+
+	ax_rightbottom.pcolor(bin_scores, cmap='Blues')
+	ax_rightbottom.set_yticks([])
+	ax_rightbottom.set_xticks([])
+	ax_rightbottom.set_xlim([0,200])
+
+	ax_lefttop.plot(np.average(fimo_mat, axis=0))
+	ax_righttop.plot(np.average(scores, axis=0))
+	ax_lefttop.set_yticks([])
+	ax_righttop.set_yticks([])
+
+	fig.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
+	plt.close()
 
 	plt.figure()
 	plt.hist(diffs, bins=30)
