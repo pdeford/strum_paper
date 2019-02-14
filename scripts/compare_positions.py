@@ -175,11 +175,11 @@ def main(basename, n_process=1):
 	ax_rightbottom.set_xlim([0,200])
 
 	ax_lefttop.plot(np.average(fimo_mat, axis=0))
-	ax_righttop.plot(np.average(scores, axis=0))
+	ax_righttop.plot(np.average(bin_scores, axis=0))
 	ax_lefttop.set_yticks([])
 	ax_righttop.set_yticks([])
 
-	fig.savefig("output/{}_fimo_v_strum_matches.png".format(basename))
+	fig.savefig("output/{}_fimo_v_strum_matches2.png".format(basename))
 	plt.close()
 
 	plt.figure()
