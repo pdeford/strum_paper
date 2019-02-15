@@ -44,9 +44,11 @@ parser.add_argument('-p', '--positions', metavar='position_comp.txt',
 parser.add_argument('-c', '--coefficients', metavar='coefficients.txt', 
 	type=argparse.FileType('rb'), required=True, 
 	help="Path to file with coefficients from Logistic Regression model combining PWMs with StruMs.")
+parser.add_argument('-s', '--specificities', metavar='specificities.txt', 
+    type=argparse.FileType('rb'), required=True, 
+    help="Path to file with AUCs of the specificity test.")
 
 args = parser.parse_args()
-
 
 
 ## AUCs from Peak v. Non-Peak comparison
@@ -109,6 +111,20 @@ for i,g in enumerate(coeff_genes):
 	auc_coeff_idx[g] = i
 auc_ordr = [auc_coeff_idx[g] for g in pknonpk_genes]
 shuff_coeffs = shuff_coeffs[auc_ordr]
+
+## AUCs from TF performance in a TF vs Same-Family and 
+## TF vs Other-Family sequences.
+###Format: TF auROC-Diff auPRC-Diff auROC-Same auPRC-Same
+f = args.specificities
+spec_tfs = []
+spec_data = []
+for line in f:
+    fields = line.split()
+    spec_tfs.append(fields[0])
+    spec_data.append([float(x) for x in fields[1:]])
+
+spec_tfs = np.asarray(spec_tfs)
+spec_data = np.asarray(spec_data)
 
 # flank_coeffs = np.asarray(flank_coeffs)
 
@@ -432,8 +448,34 @@ for side in ['top', 'right', 'left', 'bottom']:
 # 4B) Specificity of shape- vs base-readout TFs
 ax_b = plt.subplot(2,2,2)
 
-goi_seq = ['STAT', 'GATA']
+# goi_seq = ['STAT', 'GATA']
 goi_shp = ['TBP', 'LEF', 'RFX',]
+goi_seq = [
+	"STAT", "NFAT", "GATA", # Definitely in the dataset
+	"BHTH", "homeodomains", # Classes of proteins
+		"CTCF", "CTCFL", #"DNMT1", "E4F1", "GATA2", "HINFP", "KLF13", # Zinc fingers
+		#"KLF1", "VEZF1", "ZBTB40", "ZFX", "EGR1", "GATA1", "GATAD2A", # Zinc fingers
+		#"GATAD2B", "IKZF1", "KLF16", "MTA1", "MYNN", "PRDM10", "REST", # Zinc fingers
+		#"RLF", "SP1", "THAP1", "ZBED1", "ZBTB2", "ZBTB33", "ZBTB5", # Zinc fingers
+		#"ZBTB7A", "ZFP91", "ZKSCAN1", "ZSCAN29", # Zinc fingers
+		# "HMBOX1", "MEIS2", "PKNOX1",  "CUX1", "SIX5", "ZEB2", "ZHX1", # Homeodomains
+	"P53", "RAR", # Missing in the dataset
+	"NF-kB", "NFRKB", # NF-kB like
+	"KORA", # Pseudomondas
+	"TALE", # Bacteria
+	"TFIIIA", # Arabidopsis
+	]
+goi_shp = [
+	"LEF1", 
+	"RFX1", "RFX5", # related to RFX1
+	"CMYB", "MYBL2", # related to c-MYB
+	"Oct4", "POU5F1",  # Another name for Oct4
+	"TBP", "CAP", "RevErb", "SRY", "SOX", # Missing from dataset
+	"434", "trp repressor", "MET repressor", "metJ", "IHF", "p22 repressor", "mar A", # Bacteria
+	"Scr", "Exd", # Drosophila
+	]
+
+
 text = []
 
 roi_seq = np.zeros(pwm_auc.shape, dtype=bool)
@@ -443,7 +485,7 @@ for subg in goi_seq:
 			g = g.split('.')[0]
 			if len(g) > len(subg) + 1: continue
 			roi_seq[i] = True
-			text.append((i, g, pwm_auc[i], strum_auc[i]))
+			text.append((i, g, pwm_auc[i], strum_auc[i], 0))
 roi_shp = np.zeros(pwm_auc.shape, dtype=bool)
 for subg in goi_shp:
 	for i, g in enumerate(pknonpk_genes):
@@ -451,7 +493,7 @@ for subg in goi_shp:
 			g = g.split('.')[0]
 			if len(g) > len(subg) + 1: continue
 			roi_shp[i] = True
-			text.append((i, g, pwm_auc[i], strum_auc[i]))
+			text.append((i, g, pwm_auc[i], strum_auc[i], 1))
 
 plt.plot(pwm_auc, strum_auc, '.', c='gray')
 plt.plot(pwm_auc[roi_seq], strum_auc[roi_seq], markers[0], 
@@ -460,12 +502,14 @@ plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[3],
 		 c=colors[3], ms=6, label='Shape Readout')
 plt.plot(plt.xlim(), plt.ylim(), '--', c='gray')
 
-for i,g,x,y in text:
+for i,g,x,y,j in text:
 	plt.text(x, y, g, dict(weight='bold'))
 
 plt.legend(loc='upper left')
 plt.xlabel("PWM auROC", weight='bold')
 plt.ylabel("EM-StruM auROC", weight='bold')
+
+extra_colors = ['gold', 'skyblue']
 
 # 4C)  Logit coefficients sorted by improvement over PWM AUC
 ax_c = plt.subplot(2,2,3)
@@ -476,12 +520,12 @@ idx = np.argsort(x)
 for i in [0,3]:#range(4):
 	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
 	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
-for i,g,xval,yval in text:
+for i,g,xval,yval,j in text:
 	xval = np.where(idx==i)[0]
 	y1 = shuff_coeffs[i,0]
 	y2 = shuff_coeffs[i,3]
 	yt = (y1+y2)/2.
-	plt.plot([xval,xval], [y1,y2], 'k-')
+	plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=2.5)
 	plt.text(xval, yt, g, dict(weight='bold'))
 plt.legend(ncol=4, bbox_to_anchor=[0.0, 0.93], loc='upper left')
 ax_c2 = ax_c.twinx()
@@ -503,12 +547,12 @@ idx = np.argsort(x)
 for i in [0,3]:#range(4):
 	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
 	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
-for i,g,xval,yval in text:
+for i,g,xval,yval,j in text:
 	xval = np.where(idx==i)[0]
 	y1 = shuff_coeffs[i,0]
 	y2 = shuff_coeffs[i,3]
 	yt = (y1+y2)/2.
-	plt.plot([xval,xval], [y1,y2], 'k-')
+	plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=2.5)
 	plt.text(xval, yt, g, dict(weight='bold'))
 ax_d2 = ax_d.twinx()
 # ax_d2.set_ylabel("Combined - StruM ($\Delta$ AUC)", color='r', weight='bold', rotation=270)
@@ -546,7 +590,7 @@ plt.hist(avgdist_data, bins=np.linspace(0,60,31))
 # Correlated
 ax_b = plt.subplot(5,1,2)
 cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
-							+ "_fimo_v_strum_matches.png")
+							+ "_fimo_v_strum_matches2.png")
 ax_b.set_title("TAL1", loc='left')
 ax_b.imshow(cor_img)
 ax_b.xaxis.set_visible(False)
@@ -555,7 +599,7 @@ ax_b.yaxis.set_visible(False)
 # Flanking
 ax_c = plt.subplot(5,1,3)
 flank_img = mpl.image.imread("output/" + "RFX1.ENCFF934JXG" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
-								+ "_fimo_v_strum_matches.png")
+								+ "_fimo_v_strum_matches2.png")
 ax_c.set_title("RFX1", loc='left')
 ax_c.imshow(flank_img)
 ax_c.xaxis.set_visible(False)
@@ -564,8 +608,8 @@ ax_c.yaxis.set_visible(False)
 
 # Anti Correlated
 ax_d = plt.subplot(5,1,4)
-anticor_img = mpl.image.imread("output/" + "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
-							+ "_fimo_v_strum_matches.png")
+anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+							+ "_fimo_v_strum_matches2.png")
 ax_d.set_title("RLF", loc='left')
 ax_d.imshow(anticor_img)
 ax_d.xaxis.set_visible(False)
@@ -574,7 +618,7 @@ ax_d.yaxis.set_visible(False)
 # Not Correlated
 ax_e = plt.subplot(5,1,5)
 rand_img = mpl.image.imread("output/" + "SNIP1.ENCFF772GVZ" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
-							+ "_fimo_v_strum_matches.png")
+							+ "_fimo_v_strum_matches2.png")
 ax_e.set_title("SNIP1", loc='left')
 ax_e.imshow(rand_img)
 # ax_e.xaxis.set_visible(False)

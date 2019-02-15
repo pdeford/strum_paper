@@ -37,6 +37,11 @@ touch output/correlations.txt
 ## Download FOXA1 binding information from JASPAR
 ## Example for figures
 #curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+#
+## Get TF_class data
+## From http://tfclass.bioinf.med.uni-goettingen.de/about.jsf
+#curl "http://tfclass.bioinf.med.uni-goettingen.de/suppl/tfclass.ttl.gz" > data/tfclass.ttl.gz
+#gunzip data/tfclass.ttl.gz
 
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
@@ -63,6 +68,34 @@ do
 	bash scripts/do_one.sh $n_process $line
 done
 
+# Check specificity of StruMs to their factors:
+echo "------------------------------------------------------------"
+echo -n "["$(date +"%F %T")"] "; echo "EVALUTE SPECIFICITY OF STRUMs"
+echo -n "["$(date +"%F %T")"] "; echo "Assign TFs to families"
+python scripts/classify_tfs.py > output/families.txt
+echo -n "["$(date +"%F %T")"] "; echo "Compile sequeces"
+python scripts/sequence_by_class.py
+
+cut -f1 output/families.txt | head -n3 | while read tf; do 
+	ls data/${tf}.ENCFF??????.fa | while read line; do 
+		echo $line; 
+		fname=${line##*/}
+		tf=${fname%%.*}
+		suffix=${fname##*.K562.}
+		accession=${suffix%.*}
+
+		basename=$tf'.'$accession
+		echo -n "["$(date +"%F %T")"] "; echo $basename
+
+		# Set random seed for reproducibility
+		seed=$(python scripts/accession2seed.py $accession)
+		echo -n "["$(date +"%F %T")"] "; echo "Random seed:" $seed
+
+		python scripts/specificity.py $basename $seed $n_process >> output/specificities.txt
+	done; 
+done
+
+
 ####################################
 # Generate the figures from output #
 ####################################
@@ -72,4 +105,5 @@ python scripts/generate_figures.py \
 	-r output/correlations.txt \
 	-p output/position_comp.txt \
 	-c output/coefficents.txt \
+	-s output/specificities.txt \
 	> RESULTS.txt
