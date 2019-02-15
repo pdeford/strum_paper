@@ -68,12 +68,12 @@ for family in sorted(families):
         except:
             continue
 
-negatives = np.random.choice(sequences, 500, False)
+negatives = list(np.random.choice(sequences, 500, False))
 
 with open("data/{}.fa".format(tf_fam)) as f:
     sequences = fasta_reader(f)
 
-negatives2 = np.random.choice(sequences, 500, False)
+negatives2 = list(np.random.choice(sequences, 500, False))
 
 
 pwm, dwm, ml_strum, em_strum, (logit, scaler), (logit2, scaler2) = pickle.load(open("output/{}.p".format(basename), "rb"))
