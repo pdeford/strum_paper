@@ -57,7 +57,11 @@ try:
     with open('data/{}.fa'.format(basename)) as f:
         positives = fasta_reader(f)[500:1000]
 except:
-    quit()
+    try:
+        with open('data/eGFP-{}.fa'.format(basename)) as f:
+            positives = fasta_reader(f)[500:1000]
+    except:
+        quit()
 
 sequences = []
 for family in sorted(families):
