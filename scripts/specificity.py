@@ -65,7 +65,7 @@ try:
 except:
     quit()
 
-negatives2 = np.random.choice(sequences, 500, False)
+decoy_positives = np.random.choice(sequences, 500, False)
 
 sequences = []
 for family in sorted(families):
@@ -92,17 +92,17 @@ for i, seq_set in enumerate([negatives, positives]):
         s1 = np.max(em_strum.score_seq_filt(seq))
         s2 = np.max(em_strum.score_seq_filt(rseq))
         x.append(max(s1,s2))
-        if i == 1:
+        if i == 0:
             y2.append(i)
             x2.append(max(s1,s2))
 
-for seq in negatives2:
+for seq in decoy_positives:
     seq = str(seq)
     rseq = rev_comp(seq)
     s1 = np.max(em_strum.score_seq_filt(seq))
     s2 = np.max(em_strum.score_seq_filt(rseq))
     x2.append(max(s1,s2))    
-    y2.append(0)
+    y2.append(1)
 
 fpr, tpr, _ = roc_curve(y, x)
 precision, recall, _ = precision_recall_curve(y, x)

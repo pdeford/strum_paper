@@ -581,8 +581,8 @@ plt.savefig("figures/figure4.pdf")
 # Figure 5: Distribution of significant StruM matches vs PWM matches #
 ######################################################################
 
-fig4 = plt.figure(figsize=[2*onecol, 2.5*twocol])
-label_plots(fig4, 5, 1)
+fig5 = plt.figure(figsize=[2*onecol, 2.5*twocol])
+label_plots(fig5, 5, 1)
 
 ax_a = plt.subplot(5,1,1)
 plt.hist(avgdist_data, bins=np.linspace(0,60,31))
@@ -673,3 +673,36 @@ print """
 """
 print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
 print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
+
+#####################################
+# Figure 7: Specificities of StruMs #
+#####################################
+
+fig6 = plt.figure(figsize([twocol, onecol]))
+label_plots(fig6, 1, 2)
+
+# auROC
+ax_a =  fig6.add_subplot(1, 2, 1)
+x1 = spec_data[:,0]
+y1 = spec_data[:,2]
+minx = min(np.min(x1), np.min(y1))
+maxx = max(np.max(x1), np.max(y1))
+ax_a.plot(x1, y1, '.', c=colors[3])
+ax_a.plot([minx, maxx], [minx, maxx], '--', c='gray')
+ax_a.set_xlim([minx, maxx])
+ax_a.set_ylim([minx, maxx])
+ax_a.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
+ax_a.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
+
+# auPRC
+ax_b =  fig6.add_subplot(1, 2, 2)
+x2 = spec_data[:,1]
+y2 = spec_data[:,3]
+minx = min(np.min(x2), np.min(y2))
+maxx = max(np.max(x2), np.max(y2))
+ax_b.plot(x2, y2, '.', c=colors[3])
+ax_b.plot([minx, maxx], [minx, maxx], '--', c='gray')
+ax_b.set_xlim([minx, maxx])
+ax_b.set_ylim([minx, maxx])
+ax_b.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
+ax_b.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
