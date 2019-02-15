@@ -38,8 +38,10 @@ for key in assignments:
     if len(assignments[key]) >= 10:
         keepers.append(key)
 
+print keepers
 for fam in keepers:
     with open('data/{}.fa'.format(fam), 'wb') as g:
+        print 'data/{}.fa'.format(fam)
         for tf in assignments[fam]:
             paths = glob.glob('data/{}.ENCFF??????.fa'.format(tf))
             for p in paths:
