@@ -43,15 +43,7 @@ for fam in keepers:
     with open('data/{}.fa'.format(fam), 'wb') as g:
         print 'data/{}.fa'.format(fam)
         for tf in assignments[fam]:
-            paths = glob.glob('data/{}.ENCFF??????.fa'.format(tf))
-            for p in paths:
-                accession = p.split('.')[-2]
-                with open(p) as f:
-                    sequences = fasta_reader(f)
-                for i,s in enumerate(sequences[500:1000]):
-                    g.write(">{}.{}.{}\n".format(tf, accession, i+500))
-                    g.write("{}\n".format(s))
-            paths = glob.glob('data/eGFP-{}.ENCFF??????.fa'.format(tf))
+            paths = glob.glob('data/*{}.ENCFF??????.fa'.format(tf))
             for p in paths:
                 accession = p.split('.')[-2]
                 with open(p) as f:

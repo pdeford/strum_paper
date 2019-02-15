@@ -1,3 +1,4 @@
+import glob
 import sys
 import numpy as np
 from sklearn.metrics import roc_curve, auc, precision_recall_curve
@@ -53,15 +54,10 @@ for line in f:
         tf_fam = fields[1]
 
 
-try:
-    with open('data/{}.fa'.format(basename)) as f:
-        positives = fasta_reader(f)[500:1000]
-except:
-    try:
-        with open('data/eGFP-{}.fa'.format(basename)) as f:
-            positives = fasta_reader(f)[500:1000]
-    except:
-        quit()
+paths = glob.glob('data/*{}.fa'.format(basename))
+
+with open(paths[0]) as f:
+    positives = fasta_reader(f)[500:1000]
 
 try:
     with open("data/{}.fa".format(tf_fam)) as f:

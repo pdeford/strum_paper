@@ -77,7 +77,7 @@ echo -n "["$(date +"%F %T")"] "; echo "Compile sequeces"
 python scripts/sequence_by_class.py
 
 cut -f1 output/families.txt | while read tf; do 
-	ls data/${tf}.ENCFF??????.fa | while read line; do 
+	ls data/*${tf}.ENCFF??????.fa | while read line; do 
 		fname=${line##*/}
 		tf=${fname%%.*}
 		suffix=${fname##$tf.}
@@ -91,7 +91,7 @@ cut -f1 output/families.txt | while read tf; do
 		echo -n "["$(date +"%F %T")"] "; echo "Random seed:" $seed
 
 		python scripts/specificity.py $basename $seed $n_process >> output/specificities.txt
-	done; 
+	done;
 done
 
 
