@@ -45,7 +45,7 @@ for fam in keepers:
         for tf in assignments[fam]:
             paths = glob.glob('data/{}.ENCFF??????.fa'.format(tf))
             for p in paths:
-                accession = paths.split('.')[-2]
+                accession = p.split('.')[-2]
                 with open(p) as f:
                     sequences = fasta_reader(f)
                 for i,s in enumerate(sequences[500:1000]):
