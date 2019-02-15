@@ -95,6 +95,7 @@ for i, seq_set in enumerate([negatives, positives]):
             x2.append(max(s1,s2))
 
 for seq in negatives2:
+    seq = str(seq)
     rseq = rev_comp(seq)
     s1 = np.max(em_strum.score_seq_filt(seq))
     s2 = np.max(em_strum.score_seq_filt(rseq))
