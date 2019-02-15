@@ -81,7 +81,7 @@ cut -f1 output/families.txt | head -n3 | while read tf; do
 		echo $line; 
 		fname=${line##*/}
 		tf=${fname%%.*}
-		suffix=${fname##*.K562.}
+		suffix=${fname##$tf.}
 		accession=${suffix%.*}
 
 		basename=$tf'.'$accession
