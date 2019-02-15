@@ -52,11 +52,21 @@ for line in f:
     if tf == fields[0]:
         tf_fam = fields[1]
 
+
+try:
+    with open('data/{}.fa'.format(basename)) as f:
+        positives = fasta_reader(f)[500:1000]
+except:
+    quit()
+
 sequences = []
 for family in sorted(families):
     if family != tf_fam:
-        with open("data/{}.fa".format(family)) as f:
-            sequences += fasta_reader(f)
+        try:
+            with open("data/{}.fa".format(family)) as f:
+                sequences += fasta_reader(f)
+        except:
+            continue
 
 negatives = np.random.choice(sequences, 500, False)
 
@@ -65,8 +75,6 @@ with open("data/{}.fa".format(tf_fam)) as f:
 
 negatives2 = np.random.choice(sequences, 500, False)
 
-with open('data/{}.fa'.format(basename)) as f:
-    positives = fasta_reader(f)[500:1000]
 
 pwm, dwm, ml_strum, em_strum, (logit, scaler), (logit2, scaler2) = pickle.load(open("output/{}.p".format(basename), "rb"))
 
