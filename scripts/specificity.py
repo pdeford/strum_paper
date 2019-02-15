@@ -1,9 +1,11 @@
 import sys
+import numpy as np
+from sklearn.metrics import roc_curve, auc, precision_recall_curve
+
 try:
     import cPickle as pickle
 except:
     import pickle
-from sklearn.metrics import roc_curve, auc, precision_recall_curve
 
 basename = sys.argv[1]
 seed = int(sys.argv[2])
