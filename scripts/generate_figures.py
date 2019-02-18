@@ -610,7 +610,7 @@ ax_c.yaxis.set_visible(False)
 ax_d = plt.subplot(5,1,4)
 anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
 							+ "_fimo_v_strum_matches2.png")
-ax_d.set_title("RLF", loc='left')
+ax_d.set_title("MEF2A", loc='left')
 ax_d.imshow(anticor_img)
 ax_d.xaxis.set_visible(False)
 ax_d.yaxis.set_visible(False)
@@ -644,14 +644,14 @@ for g in pknonpk_genes:
 left = 0.2
 bottom = 0.2
 
-fig5 = plt.figure(figsize=[onecol, onecol])
-label_plots(fig5, 1, 1)
+fig6 = plt.figure(figsize=[onecol, onecol])
+label_plots(fig6, 1, 1)
 x = R
 y = log_pwm
-ax_a = fig5.add_axes((left, bottom, 0.8-left, 0.8-bottom))
+ax_a = fig6.add_axes((left, bottom, 0.8-left, 0.8-bottom))
 ax_pos = ax_a.get_position().bounds
-ax_top = fig5.add_axes((left, 0.8, ax_pos[2], 0.2), sharex=ax_a)
-ax_right = fig5.add_axes((0.8, bottom, 0.2, ax_pos[3]), sharey=ax_a)
+ax_top = fig6.add_axes((left, 0.8, ax_pos[2], 0.2), sharex=ax_a)
+ax_right = fig6.add_axes((0.8, bottom, 0.2, ax_pos[3]), sharey=ax_a)
 ax_a.scatter(x, y, s=5, c='k')
 ax_a.set_xlabel("Correlation between scores", weight='bold')
 ax_a.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
@@ -664,7 +664,7 @@ p = np.poly1d(z)
 minx = min(x)
 maxx = max(x)
 ax_a.plot([minx,maxx],p([minx,maxx]), c=colors[0], lw=2)
-fig5.savefig('figures/figure6.pdf')
+fig6.savefig('figures/figure6.pdf')
 
 print """
 ############################################
@@ -678,31 +678,48 @@ print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
 # Figure 7: Specificities of StruMs #
 #####################################
 
-fig6 = plt.figure(figsize([twocol, onecol]))
-label_plots(fig6, 1, 2)
+fig7 = plt.figure(figsize=(twocol, onecol))
+label_plots(fig7, 1, 2)
 
 # auROC
-ax_a =  fig6.add_subplot(1, 2, 1)
+ax_a =  fig7.add_subplot(1, 2, 1)
 x1 = spec_data[:,0]
 y1 = spec_data[:,2]
-minx = min(np.min(x1), np.min(y1))
-maxx = max(np.max(x1), np.max(y1))
-ax_a.plot(x1, y1, '.', c=colors[3])
-ax_a.plot([minx, maxx], [minx, maxx], '--', c='gray')
-ax_a.set_xlim([minx, maxx])
-ax_a.set_ylim([minx, maxx])
-ax_a.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
-ax_a.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
+# minx = min(np.min(x1), np.min(y1))
+# maxx = max(np.max(x1), np.max(y1))
+# ax_a.plot(x1, y1, '.', c=colors[3])
+# ax_a.plot([minx, maxx], [minx, maxx], '--', c='gray')
+# ax_a.set_xlim([minx, maxx])
+# ax_a.set_ylim([minx, maxx])
+# ax_a.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
+# ax_a.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
+plot_box(data=np.vstack([x1,y1]).T, labels=["Cross Family", "Control"], title="auROC")
 
 # auPRC
-ax_b =  fig6.add_subplot(1, 2, 2)
+ax_b =  fig7.add_subplot(1, 2, 2)
 x2 = spec_data[:,1]
 y2 = spec_data[:,3]
-minx = min(np.min(x2), np.min(y2))
-maxx = max(np.max(x2), np.max(y2))
-ax_b.plot(x2, y2, '.', c=colors[3])
-ax_b.plot([minx, maxx], [minx, maxx], '--', c='gray')
-ax_b.set_xlim([minx, maxx])
-ax_b.set_ylim([minx, maxx])
-ax_b.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
-ax_b.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
+# minx = min(np.min(x2), np.min(y2))
+# maxx = max(np.max(x2), np.max(y2))
+# ax_b.plot(x2, y2, '.', c=colors[3])
+# ax_b.plot([minx, maxx], [minx, maxx], '--', c='gray')
+# ax_b.set_xlim([minx, maxx])
+# ax_b.set_ylim([minx, maxx])
+# ax_b.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
+# ax_b.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
+plot_box(data=np.vstack([x2,y2]).T, labels=["Cross Family", "Control"], title="auPRC")
+
+print_title("Specificity of StruMs: auROC and auPRC")
+t,p = stats.ttest_rel(x1,y1)
+avg = np.average(x1-y1)
+print "auROC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
+t,p = stats.ttest_rel(x2,y2)
+avg = np.average(x2-y2)
+print "auPRC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
+
+for ax in [ax_a, ax_b,]:
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+ax_b.set_yticklabels([])
+
+fig7.savefig("figures/figure7.pdf")
