@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 # Check command line arguments
 if [[ $# -ne 2 ]]; then
