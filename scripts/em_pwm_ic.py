@@ -53,6 +53,7 @@ def main():
             motifs.append(
                 [mname, pwm, em_strum.PWM, k, i, alignment, p_ic, np.average(p_ic), np.sum(p_ic), s_ic, np.average(s_ic), np.sum(s_ic)] + aucs[mname]
             )
+            print mname, alignment, k, np.sum(p_ic), np.sum(s_ic)
 
     motifs.sort(key=lambda x:x[5:8])
     motifs = motifs[::-1]
