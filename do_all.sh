@@ -94,6 +94,8 @@ cut -f1 output/families.txt | while read tf; do
 	done;
 done
 
+# Check quality of PWMs and StruMs
+python scripts/em_pwm_ic.py output/chip_auc.txt output/*.p
 
 ####################################
 # Generate the figures from output #
