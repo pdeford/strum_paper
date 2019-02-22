@@ -45,11 +45,6 @@ def plotter():
 			seq = seq[:j]
 		sequences_b.append( ("--" + seq)[:25] + "-")
 
-	# for thing in sequences_a + sequences_b:
-	# 	print thing
-
-	# print " "*8 + "-"*9 + " "*9 + "|"
-
 	d = [
 		("Rise",  [4 + x for x in [0.97, 0.12, 0.54, 0.33, 0.80, 0.43, 0.50, 0.96, 0.13, 0.91, 0.21]]),
 		("Twist", [2 + x for x in [0.70, 0.24, 0.47, 0.07, 0.30, 0.05, 0.85, 0.37, 0.26, 0.49, 0.91]]),
@@ -123,7 +118,6 @@ def plotter():
 	ax.spines["left"].set_visible(False)
 
 	plt.subplot(2,2,4)
-	# plt.yticks([0.5, 2.5, 4.5], [x[0] for x in d])
 
 	for i in range(3):
 		plt.errorbar(range(len(d[i][1])), d[i][1], yerr=dev, color='steelblue')
@@ -142,8 +136,6 @@ def plotter():
 	ax.spines["left"].set_visible(False)
 
 	plt.tight_layout()
-
-	# plt.savefig("figures/figure1.pdf")
 	return fig
 
 if __name__ == '__main__':
