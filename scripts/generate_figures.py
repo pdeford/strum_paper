@@ -605,23 +605,23 @@ plt.savefig("figures/figure5.pdf")
 # Figure 6: Distribution of significant StruM matches vs PWM matches #
 ######################################################################
 
-fig6 = plt.figure(figsize=[2*onecol, 2.5*twocol])
-label_plots(fig6, 5, 1)
+fig6 = plt.figure(figsize=[2*onecol, 1.5*twocol])
+label_plots(fig6, 3, 1)
 
-ax_a = plt.subplot(5,1,1)
+ax_a = plt.subplot(3,1,1)
 plt.hist(avgdist_data, bins=np.linspace(0,60,31))
 
-# Correlated
-ax_b = plt.subplot(5,1,2)
-cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
-							+ "_fimo_v_strum_matches2.png")
-ax_b.set_title("TAL1", loc='left')
-ax_b.imshow(cor_img)
-ax_b.xaxis.set_visible(False)
-ax_b.yaxis.set_visible(False)
+# # Correlated
+# ax_b = plt.subplot(3,1,2)
+# cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
+# 							+ "_fimo_v_strum_matches2.png")
+# ax_b.set_title("TAL1", loc='left')
+# ax_b.imshow(cor_img)
+# ax_b.xaxis.set_visible(False)
+# ax_b.yaxis.set_visible(False)
 
 # Flanking
-ax_c = plt.subplot(5,1,3)
+ax_c = plt.subplot(3,1,2)
 flank_img = mpl.image.imread("output/" + "RFX1.ENCFF934JXG" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
 								+ "_fimo_v_strum_matches2.png")
 ax_c.set_title("RFX1", loc='left')
@@ -630,17 +630,17 @@ ax_c.xaxis.set_visible(False)
 ax_c.yaxis.set_visible(False)
 
 
-# Anti Correlated
-ax_d = plt.subplot(5,1,4)
-anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
-							+ "_fimo_v_strum_matches2.png")
-ax_d.set_title("MEF2A", loc='left')
-ax_d.imshow(anticor_img)
-ax_d.xaxis.set_visible(False)
-ax_d.yaxis.set_visible(False)
+# # Anti Correlated
+# ax_d = plt.subplot(3,1,4)
+# anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+# 							+ "_fimo_v_strum_matches2.png")
+# ax_d.set_title("MEF2A", loc='left')
+# ax_d.imshow(anticor_img)
+# ax_d.xaxis.set_visible(False)
+# ax_d.yaxis.set_visible(False)
 
 # Not Correlated
-ax_e = plt.subplot(5,1,5)
+ax_e = plt.subplot(3,1,3)
 rand_img = mpl.image.imread("output/" + "SNIP1.ENCFF772GVZ" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
 							+ "_fimo_v_strum_matches2.png")
 ax_e.set_title("SNIP1", loc='left')
