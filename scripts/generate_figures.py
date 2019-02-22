@@ -132,6 +132,11 @@ spec_data = np.asarray(spec_data)
 # Functions to make plotting figures easier
 ######################################################################
 
+# props = {'color':'white', 'linestyle':'-', 'zorder':9, 'linewidth':3.5}
+props2 = {'color':'black', 'linestyle':'-', 'zorder':10, 'linewidth':2}
+colors = ["darkorange", "#fb9a99", "seagreen", "steelblue", "mediumpurple"]
+markers = ['d', '^', 's', 'o', '*']
+
 def cm2inch(value):
     return value/2.54
 
@@ -332,20 +337,49 @@ fig2.text(0.01, 0.6, 'B', ha='left', va='top', weight='bold', fontsize=15)
 plt.subplots_adjust(left=0.01, bottom=0.05, right=0.99, top=0.95, hspace=0.2)
 plt.savefig('figures/figure2.pdf', dpi=600)
 
+#####################################
+# Figure 3: Specificities of StruMs #
+#####################################
+
+fig3 = plt.figure(figsize=(twocol, onecol))
+label_plots(fig3, 1, 2)
+
+# auROC
+ax_a =  fig3.add_subplot(1, 2, 1)
+x1 = spec_data[:,0]
+y1 = spec_data[:,2]
+plot_box(data=np.vstack([x1,y1]).T, labels=["Cross Family", "Control"], title="auROC")
+
+# auPRC
+ax_b =  fig3.add_subplot(1, 2, 2)
+x2 = spec_data[:,1]
+y2 = spec_data[:,3]
+plot_box(data=np.vstack([x2,y2]).T, labels=["Cross Family", "Control"], title="auPRC")
+
+print_title("Specificity of StruMs: auROC and auPRC")
+t,p = stats.ttest_rel(x1,y1)
+avg = np.average(x1-y1)
+print "auROC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
+t,p = stats.ttest_rel(x2,y2)
+avg = np.average(x2-y2)
+print "auPRC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
+
+for ax in [ax_a, ax_b,]:
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+ax_b.set_yticklabels([])
+
+fig3.savefig("figures/figure3.pdf")
+
 ######################################################################
-# Figure 3: StruMs outperform, but are complementary to, PWMs (AUCs) #
+# Figure 4: StruMs outperform, but are complementary to, PWMs (AUCs) #
 ######################################################################
 
-# props = {'color':'white', 'linestyle':'-', 'zorder':9, 'linewidth':3.5}
-props2 = {'color':'black', 'linestyle':'-', 'zorder':10, 'linewidth':2}
-colors = ["darkorange", "#fb9a99", "seagreen", "steelblue", "mediumpurple"]
-markers = ['d', '^', 's', 'o', '*']
-
-fig3 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
+fig4 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
 plt.subplot(2,1,1)
-label_plots(fig3, 2, 2)
+label_plots(fig4, 2, 2)
 
-# 3A) auROCs of motifs using shuffled sequence as background
+# 4A) auROCs of motifs using shuffled sequence as background
 ax_a = plt.subplot(2,2,1)
 plt.title("Shuffled background", weight='bold')
 plot_box(shuff_AUCs, pknonpk_labels)
@@ -354,10 +388,9 @@ plt.ylabel("auROC", weight='bold')
 ## STATISTICS
 print_title("Difference in auROCs, shuffled background")
 t_vals, p_vals = do_ttest(shuff_AUCs, pknonpk_labels)
-# box_sig_lines(p_vals, ax_a, shuff_AUCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_a)
 
-# 3B) auROCs of motifs using flanking sequence as background
+# 4B) auROCs of motifs using flanking sequence as background
 ax_b = plt.subplot(2,2,2)
 plt.title("Flanking background", weight='bold')
 plot_box(flank_AUCs, pknonpk_labels)
@@ -366,10 +399,9 @@ plt.ylabel("auROC", weight='bold')
 ## STATISTICS
 print_title("Difference in auROCs, flanking seq as background")
 t_vals, p_vals = do_ttest(flank_AUCs, pknonpk_labels)
-# box_sig_lines(p_vals, ax_b, flank_AUCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_b)
 
-# 3C) auPRCs of motifs using shuffled sequence as background
+# 4C) auPRCs of motifs using shuffled sequence as background
 ax_c = plt.subplot(2,2,3)
 plot_box(shuff_PRCs, pknonpk_labels)
 plt.ylabel("auPRC", weight='bold')
@@ -377,10 +409,9 @@ plt.ylabel("auPRC", weight='bold')
 ## STATISTICS
 print_title("Difference in auPRCs, shuffled background")
 t_vals, p_vals = do_ttest(shuff_PRCs, pknonpk_labels)
-# box_sig_lines(p_vals, ax_c, shuff_PRCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_c)
 
-# 3D) auPRCs of motifs using flanking sequence as background
+# 4D) auPRCs of motifs using flanking sequence as background
 ax_d = plt.subplot(2,2,4)
 plot_box(flank_PRCs, pknonpk_labels)
 plt.ylabel("auPRC", weight='bold')
@@ -388,7 +419,6 @@ plt.ylabel("auPRC", weight='bold')
 ## STATISTICS
 print_title("Difference in auPRCs, flanking seq as background")
 t_vals, p_vals = do_ttest(flank_PRCs, pknonpk_labels)
-# box_sig_lines(p_vals, ax_d, flank_PRCs)
 plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_d)
 
 plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.975,
@@ -398,16 +428,16 @@ for ax in [ax_a, ax_b, ax_c, ax_d,]:
 	ax.spines["top"].set_visible(False)
 	ax.spines["right"].set_visible(False)
 
-plt.savefig("figures/figure3.pdf")
+plt.savefig("figures/figure4.pdf")
 
 ######################################################################
-# Figure 4: Readout mechanisms revealed by model                     #
+# Figure 5: Readout mechanisms revealed by model                     #
 ######################################################################
 
-fig4 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
-label_plots(fig4, 2, 2)
+fig5 = plt.figure(figsize=[2*twocol, 2*4./5*twocol])
+label_plots(fig5, 2, 2)
 
-# 4A) Logit coefficients sorted by improvement over PWM AUC
+# 5A) Logit coefficients sorted by improvement over PWM AUC
 pwm_auc = shuff_AUCs[:,0]
 strum_auc = shuff_AUCs[:,3]
 
@@ -425,18 +455,11 @@ print "\nStruMs are best for {} experiments".format(n2)
 print "Fraction: {}".format(float(n2)/N)
 print "\nTotal number of experiments: {}".format(N)
 
-plt.plot(log_pwm, log_strum, '.', c='gray')
+plt.plot(log_pwm, log_strum, '.', c='grey')
 
 plt.xlabel("Combined - PWM ($\Delta$ AUC)", weight='bold')
 plt.ylabel("Combined - StruM ($\Delta$ AUC)", weight='bold')
 
-# xmin, xmax = plt.xlim()
-# ymin, ymax = plt.ylim()
-# xmin = ymin = min(xmin, ymin)
-# plt.xlim([xmin, xmax])
-# plt.ylim([ymin, ymax])
-# ax_a.spines["top"].set_visible(False)
-# ax_a.spines["right"].set_visible(False)
 plt.axhline(0, c='k')
 plt.axvline(0, c='k')
 ax_a.yaxis.set_label_coords(-0.1,0.5)
@@ -444,12 +467,43 @@ ax_a.yaxis.set_label_coords(-0.1,0.5)
 for side in ['top', 'right', 'left', 'bottom']:
 		ax_a.spines[side].set_visible(False)
 
+# 5B) Correlation of scores between sequence and shape models
+R = []
+for g in pknonpk_genes:
+    if g in corr:
+        R.append(corr[g])
+left = 0.08
+bottom = 0.16
 
-# 4B) Specificity of shape- vs base-readout TFs
-ax_b = plt.subplot(2,2,2)
+x = R
+y = log_pwm
+ax_b = fig5.add_axes((0.5+0.5*left, 0.5+0.5*bottom, 0.5*(0.8-left), 0.5*(0.8-bottom)))
+ax_pos = ax_b.get_position().bounds
+ax_top = fig5.add_axes((0.5+0.5*left, 0.5+0.5*0.8, ax_pos[2], 0.5*0.2), sharex=ax_b)
+ax_right = fig5.add_axes((0.5+0.5*0.8, 0.5+0.5*bottom, 0.5*0.2, ax_pos[3]), sharey=ax_b)
+ax_b.scatter(x, y, s=5, c='grey')
+ax_b.set_xlabel("Correlation between scores", weight='bold')
+ax_b.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
+ax_top.hist(x, bins=30, facecolor='grey')
+ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
+ax_top.axis('off')
+ax_right.axis('off')
+z = np.polyfit(x, y, 1)
+p = np.poly1d(z)
+minx = min(x)
+maxx = max(x)
+ax_b.plot([minx,maxx],p([minx,maxx]), c=colors[0], lw=2)
+
+print_title("CORRELATION BETWEEN PWM AND STRUM SCORES")
+print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
+print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
+
+
+# 5C) Specificity of shape- vs base-readout TFs
+ax_c = plt.subplot(2,2,3)
 
 # goi_seq = ['STAT', 'GATA']
-goi_shp = ['TBP', 'LEF', 'RFX',]
+# goi_shp = ['TBP', 'LEF', 'RFX',]
 goi_seq = [
 	"STAT", "NFAT", "GATA", # Definitely in the dataset
 	"BHTH", "homeodomains", # Classes of proteins
@@ -495,12 +549,12 @@ for subg in goi_shp:
 			roi_shp[i] = True
 			text.append((i, g, pwm_auc[i], strum_auc[i], 1))
 
-plt.plot(pwm_auc, strum_auc, '.', c='gray')
+plt.plot(pwm_auc, strum_auc, '.', c='grey')
 plt.plot(pwm_auc[roi_seq], strum_auc[roi_seq], markers[0], 
 		 c=colors[0], ms=6, label='Base Readout')
 plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[3], 
 		 c=colors[3], ms=6, label='Shape Readout')
-plt.plot(plt.xlim(), plt.ylim(), '--', c='gray')
+plt.plot(plt.xlim(), plt.ylim(), '--', c='grey')
 
 for i,g,x,y,j in text:
 	plt.text(x, y, g, dict(weight='bold'))
@@ -511,14 +565,13 @@ plt.ylabel("EM-StruM auROC", weight='bold')
 
 extra_colors = ['gold', 'skyblue']
 
-# 4C)  Logit coefficients sorted by improvement over PWM AUC
-ax_c = plt.subplot(2,2,3)
+# 5D)  Logit coefficients sorted by improvement over PWM AUC
+ax_d = plt.subplot(2,2,4)
 
 plt.ylabel("logit coefficients", weight='bold')
 x = shuff_AUCs[:,4] - shuff_AUCs[:,0]
 idx = np.argsort(x)
 for i in [0,3]:#range(4):
-	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
 	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
 for i,g,xval,yval,j in text:
 	xval = np.where(idx==i)[0]
@@ -528,61 +581,32 @@ for i,g,xval,yval,j in text:
 	plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=2.5)
 	plt.text(xval, yt, g, dict(weight='bold'))
 plt.legend(ncol=4, bbox_to_anchor=[0.0, 0.93], loc='upper left')
-ax_c2 = ax_c.twinx()
-ax_c2.tick_params('y', colors='r')
-plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
-plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
-ax_c.set_xticks([])
-ax_c.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
-
-ax_c.yaxis.set_label_coords(-0.1,0.5)
-ax_c2.yaxis.set_label_coords(1.15,0.5)
-# plt.xlabel("Combined - PWM ($\Delta$ AUC)", weight='bold')
-
-# 4D) Logit coefficients sorted by improvement over StruM AUC
-ax_d = plt.subplot(2,2,4)
-# plt.ylabel("logit coefficients", weight='bold')
-x = shuff_AUCs[:,4] - shuff_AUCs[:,3]
-idx = np.argsort(x)
-for i in [0,3]:#range(4):
-	# plt.plot(x, shuff_coeffs[:,i], markers[i], c=colors[i], label=coeff_labels[i])
-	plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i])
-for i,g,xval,yval,j in text:
-	xval = np.where(idx==i)[0]
-	y1 = shuff_coeffs[i,0]
-	y2 = shuff_coeffs[i,3]
-	yt = (y1+y2)/2.
-	plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=2.5)
-	plt.text(xval, yt, g, dict(weight='bold'))
 ax_d2 = ax_d.twinx()
-# ax_d2.set_ylabel("Combined - StruM ($\Delta$ AUC)", color='r', weight='bold', rotation=270)
 ax_d2.tick_params('y', colors='r')
-plt.plot(x[idx], 'r-', label="Combined - StruM ($\Delta$ AUC)")
+plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
 plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
 ax_d.set_xticks([])
 ax_d.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
+
 ax_d.yaxis.set_label_coords(-0.1,0.5)
 ax_d2.yaxis.set_label_coords(1.15,0.5)
-
-# plt.legend(ncol=4, bbox_to_anchor=[0.5, 1], loc='upper center')
-# plt.xlabel("Combined - StruM ($\Delta$ AUC)", weight='bold')
 
 plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.975,
                 wspace=0.2, hspace=0.2)
 
-for ax in [ax_a, ax_b, ax_c, ax_d,]:
+for ax in [ax_a, ax_c, ax_d,]:
 	ax.spines["top"].set_visible(False)
 	ax.spines["right"].set_visible(False)
 
-plt.savefig("figures/figure4.pdf")
+plt.savefig("figures/figure5.pdf")
 
 
 ######################################################################
-# Figure 5: Distribution of significant StruM matches vs PWM matches #
+# Figure 6: Distribution of significant StruM matches vs PWM matches #
 ######################################################################
 
-fig5 = plt.figure(figsize=[2*onecol, 2.5*twocol])
-label_plots(fig5, 5, 1)
+fig6 = plt.figure(figsize=[2*onecol, 2.5*twocol])
+label_plots(fig6, 5, 1)
 
 ax_a = plt.subplot(5,1,1)
 plt.hist(avgdist_data, bins=np.linspace(0,60,31))
@@ -631,95 +655,5 @@ ax_e.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Positi
 
 plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.975,
                 wspace=0.2, hspace=0.2)
-plt.savefig('figures/figure5.pdf')
+plt.savefig('figures/figure6.pdf')
 
-################################################
-# Figure 6: Correlation between PWM and StruMs #
-################################################
-
-R = []
-for g in pknonpk_genes:
-	if g in corr:
-		R.append(corr[g])
-left = 0.2
-bottom = 0.2
-
-fig6 = plt.figure(figsize=[onecol, onecol])
-label_plots(fig6, 1, 1)
-x = R
-y = log_pwm
-ax_a = fig6.add_axes((left, bottom, 0.8-left, 0.8-bottom))
-ax_pos = ax_a.get_position().bounds
-ax_top = fig6.add_axes((left, 0.8, ax_pos[2], 0.2), sharex=ax_a)
-ax_right = fig6.add_axes((0.8, bottom, 0.2, ax_pos[3]), sharey=ax_a)
-ax_a.scatter(x, y, s=5, c='k')
-ax_a.set_xlabel("Correlation between scores", weight='bold')
-ax_a.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
-ax_top.hist(x, bins=30, facecolor='grey')
-ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
-ax_top.axis('off')
-ax_right.axis('off')
-z = np.polyfit(x, y, 1)
-p = np.poly1d(z)
-minx = min(x)
-maxx = max(x)
-ax_a.plot([minx,maxx],p([minx,maxx]), c=colors[0], lw=2)
-fig6.savefig('figures/figure6.pdf')
-
-print """
-############################################
-# CORRELATION BETWEEN PWM AND STRUM SCORES #
-############################################
-"""
-print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
-print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
-
-#####################################
-# Figure 7: Specificities of StruMs #
-#####################################
-
-fig7 = plt.figure(figsize=(twocol, onecol))
-label_plots(fig7, 1, 2)
-
-# auROC
-ax_a =  fig7.add_subplot(1, 2, 1)
-x1 = spec_data[:,0]
-y1 = spec_data[:,2]
-# minx = min(np.min(x1), np.min(y1))
-# maxx = max(np.max(x1), np.max(y1))
-# ax_a.plot(x1, y1, '.', c=colors[3])
-# ax_a.plot([minx, maxx], [minx, maxx], '--', c='gray')
-# ax_a.set_xlim([minx, maxx])
-# ax_a.set_ylim([minx, maxx])
-# ax_a.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
-# ax_a.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
-plot_box(data=np.vstack([x1,y1]).T, labels=["Cross Family", "Control"], title="auROC")
-
-# auPRC
-ax_b =  fig7.add_subplot(1, 2, 2)
-x2 = spec_data[:,1]
-y2 = spec_data[:,3]
-# minx = min(np.min(x2), np.min(y2))
-# maxx = max(np.max(x2), np.max(y2))
-# ax_b.plot(x2, y2, '.', c=colors[3])
-# ax_b.plot([minx, maxx], [minx, maxx], '--', c='gray')
-# ax_b.set_xlim([minx, maxx])
-# ax_b.set_ylim([minx, maxx])
-# ax_b.set_xlabel("AUC (TF Peak vs Other TF Families)", weight='bold')
-# ax_b.set_ylabel("AUC (Same TF family vs Other TF Families)", weight='bold')
-plot_box(data=np.vstack([x2,y2]).T, labels=["Cross Family", "Control"], title="auPRC")
-
-print_title("Specificity of StruMs: auROC and auPRC")
-t,p = stats.ttest_rel(x1,y1)
-avg = np.average(x1-y1)
-print "auROC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
-t,p = stats.ttest_rel(x2,y2)
-avg = np.average(x2-y2)
-print "auPRC:: Avg improvement {:>5.2f} (t-stat: {:>5.2f}, p: {:>5.2e})".format(avg, t, p)
-
-for ax in [ax_a, ax_b,]:
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-ax_b.set_yticklabels([])
-
-fig7.savefig("figures/figure7.pdf")
