@@ -100,7 +100,6 @@ python scripts/em_pwm_ic.py output/chip_auc.txt output/*.p > output/alignments.t
 ####################################
 # Generate the figures from output #
 ####################################
-python scripts/overview_fig.py
 python scripts/generate_figures.py \
 	-a output/chip_auc.txt \
 	-r output/correlations.txt \
