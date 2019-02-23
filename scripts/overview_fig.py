@@ -12,8 +12,14 @@ C 0.4 0.0 0.0 0.0 0.0 0.0 0.0 0.2 0.2
 G 0.3 0.0 1.0 0.0 0.0 0.0 0.1 0.6 0.3
 T 0.1 0.3 0.0 0.0 1.0 0.0 0.0 0.0 0.1"""
 
-def plotter():
+def cm2inch(value):
+    return value/2.54
 
+onecol = cm2inch(84/10.)
+twocol = cm2inch(178/10.)
+maxheight = cm2inch(230/10.)
+
+def plotter():
 	x_vals = np.linspace(0, 28, 500)
 	helix_a = np.sin(x_vals)
 	helix_b = np.sin(x_vals + 2)
@@ -52,7 +58,7 @@ def plotter():
 	]
 	dev = [0.24, 0.28, 0.29, 0.27, 0.17, 0.30, 0.29, 0.12, 0.28, 0.26, 0.26]
 
-	fig = plt.figure(figsize=[7, 3])
+	fig = plt.figure(figsize=[twocol, onecol])
 
 	plt.subplot(2,2,1)
 	ax = plt.gca()
