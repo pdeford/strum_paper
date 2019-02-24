@@ -589,7 +589,9 @@ ax_c.plot([minx,maxx],p([minx,maxx]), c='red', lw=1.5)
 
 print_title("CORRELATION BETWEEN PWM AND STRUM SCORES")
 print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
-print "Correlation: {:0.3f}".format(np.corrcoef(x,y)[0,1])
+print "Correlation: {:0.3f} (p-value: {:0.2e})".format(*stats.pearsonr(x,y))
+print "Avg. X (correlation):        {:>7.4f} +/- {:>5.2f}".format(np.average(x), np.std(x))
+print "Avg. Y (Combined - PWM AUC): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
 
 # 5D)  Logit coefficients sorted by improvement over PWM AUC
 fig5.text(0.01, 0.45, 'D', ha='left', va='top', weight='bold', fontsize=10)
