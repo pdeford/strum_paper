@@ -16,6 +16,7 @@ n_process=$1
 # Prepare the environment
 source activate strum_paper
 mkdir data figures output
+mkdir Supplemental
 touch output/correlations.txt
 
 ###########################
@@ -97,6 +98,13 @@ done
 # Check quality of PWMs and StruMs
 python scripts/em_pwm_ic.py output/chip_auc.txt output/*.p > output/alignments.txt
 
+####################################
+mv output/sorted_motif_heatmaps.png \
+  output/sorted_motifs.png \
+  output/scatter_matrix.png \
+  output/motif_alignments \
+  output/motif_similarity_dist.png \
+  Supplemental/
 ####################################
 # Generate the figures from output #
 ####################################
