@@ -61,7 +61,26 @@ def score_all(basename, n_process, random_seed, models, sequences):
 		pool.join()
 		data += data_
 
+    data2 = []
+    for i, seq_set in enumerate([decoys, peaks]):
+        data_ = []
+        for seq in seq_set:
+            ml_strum_scores = [
+                ml_strum.score_seq_filt(seq),
+                ml_strum.score_seq_filt(rev_comp(seq))
+                ]
+            em_strum_scores = [
+                em_strum.score_seq_filt(seq),
+                em_strum.score_seq_filt(rev_comp(seq))
+                ]
+            data_.append((np.max(np.hstack(ml_strum_scores)), np.max(np.hstack(em_strum_scores))))
+        data2 += data_
+
+
+
 	data = np.vstack(data)	
+    data2 = np.vstack(data2)
+    data = np.hstack(data, data2)
 	y = np.array(y, dtype=int)
 
 	# Filter out bad sequences
@@ -90,6 +109,26 @@ def score_all(basename, n_process, random_seed, models, sequences):
 	pool.close()
 	pool.join()
 	data2 = np.vstack(data2)
+
+    data3 = []
+    for seq in decoys2:
+        ml_strum_scores = [
+            ml_strum.score_seq_filt(seq),
+            ml_strum.score_seq_filt(rev_comp(seq))
+            ]
+        em_strum_scores = [
+            em_strum.score_seq_filt(seq),
+            em_strum.score_seq_filt(rev_comp(seq))
+            ]
+        data3.append((np.max(np.hstack(ml_strum_scores)), np.max(np.hstack(em_strum_scores))))
+
+
+
+    data = np.vstack(data)  
+    data2 = np.vstack(data2)
+    data3 = np.vstack(data3)
+    data2 = np.hstack([data2, data3])
+    data = np.hstack(data, data2)
 
 	print >> sys.stderr, "Decoys ROCs"
 	results2 = []
@@ -295,8 +334,6 @@ def fasta_reader(file_obj):
 def eval_seq(seq):
 		pwm_scores = []
 		dwm_scores = []
-		ml_strum_scores = []
-		em_strum_scores = []
 		for j in range(len(seq) - k + 1):
 			kmer = seq[j:j+k]
 			if 'N' in kmer: continue
@@ -305,13 +342,7 @@ def eval_seq(seq):
 			pwm_scores.append(score_pwm(pwm, rkmer))
 			dwm_scores.append(score_dwm(dwm, kmer))
 			dwm_scores.append(score_dwm(dwm, rkmer))
-		ml_strum_scores.append(ml_strum.score_seq_filt(seq))
-		ml_strum_scores.append(ml_strum.score_seq_filt(rev_comp(seq)))
-		em_strum_scores.append(em_strum.score_seq_filt(seq))
-		em_strum_scores.append(em_strum.score_seq_filt(rev_comp(seq)))
-		return (np.max(pwm_scores), np.max(dwm_scores), 
-			    np.max(np.hstack(ml_strum_scores)), 
-			    np.max(np.hstack(em_strum_scores)))
+		return (np.max(pwm_scores), np.max(dwm_scores))
 
 if __name__ == '__main__':
 	basename = sys.argv[1]

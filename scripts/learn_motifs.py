@@ -41,7 +41,7 @@ def learn(basename, n_process, random_seed):
 	print >> sys.stderr, "Train ML motifs"
 	pwm = learn_pwm(sequences)
 	dwm = learn_dwm(sequences)
-	ml_strum = learn_strum(sequences)
+	ml_strum = learn_strum(sequences, n_process)
 	ml_strum.filter()
 
 	k = pwm.shape[1]
@@ -120,10 +120,10 @@ def fasta_reader(file_obj):
 		sequences.append(currSeq.upper())
 	return sequences
 
-def learn_strum(sequences):
+def learn_strum(sequences, n_process):
 	"""Generate a StruM from a set of training sequences."""
 	"""StruM = Structural Motif"""
-	motif = strum.StruM(mode='full')
+	motif = strum.StruM(mode='full', n_process=n_process)
 	motif.train(sequences, lim=0.1)
 	return motif
 
