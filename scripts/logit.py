@@ -128,7 +128,6 @@ def score_all(basename, n_process, random_seed, models, sequences):
     data2 = np.vstack(data2)
     data3 = np.vstack(data3)
     data2 = np.hstack([data2, data3])
-    data = np.hstack([data, data2])
 
     print >> sys.stderr, "Decoys ROCs"
     results2 = []
