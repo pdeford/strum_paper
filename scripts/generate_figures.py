@@ -455,9 +455,9 @@ for ax in [ax_a, ax_b, ax_c, ax_d,]:
 
 plt.savefig("figures/figure4.pdf")
 
-######################################################################
-# Figure 5: Readout mechanisms revealed by model                     #
-######################################################################
+#######################################
+# Figure 5: Complementarity of models #
+#######################################
 
 fig5 = plt.figure(figsize=[twocol, 2./3*twocol])
 label_plots(fig5, 1, 3)
@@ -492,8 +492,129 @@ ax_a.yaxis.set_label_coords(-0.175,0.5)
 for side in ['top', 'right', 'left', 'bottom']:
         ax_a.spines[side].set_visible(False)
 
-# 5B) Specificity of shape- vs base-readout TFs
-ax_b = plt.subplot(2,3,2)
+
+# 5B) Correlation of scores between sequence and shape models
+R = []
+for g in pknonpk_genes:
+    if g in corr:
+        R.append(corr[g])
+left = 0.2
+bottom = 0.16
+
+x = R
+y = log_pwm
+ax_b = fig5.add_axes((0.33+0.33*left, 0.5+0.5*bottom, 0.33*(0.8-left), 0.5*(0.75-bottom)))
+ax_pos = ax_b.get_position().bounds
+ax_top = fig5.add_axes((0.33+0.33*left, 0.5+0.5*0.75, ax_pos[2], 0.5*0.2), sharex=ax_b)
+ax_right = fig5.add_axes((0.33+0.33*0.8, 0.5+0.5*bottom, 0.33*0.2, ax_pos[3]), sharey=ax_b)
+ax_b.plot(x, y, '.', markersize=3, c='grey')
+ax_b.set_xlabel("Correlation between scores", weight='bold')
+ax_b.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
+ax_b.yaxis.set_label_coords(-0.175,0.5)
+ax_top.hist(x, bins=30, facecolor='grey')
+ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
+ax_top.axis('off')
+ax_right.axis('off')
+z = np.polyfit(x, y, 1)
+p = np.poly1d(z)
+minx = min(x)
+maxx = max(x)
+ax_b.plot([minx,maxx],p([minx,maxx]), c='red', lw=1.5)
+
+print_title("CORRELATION BETWEEN PWM AND STRUM SCORES")
+print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
+print "Correlation: {:0.3f} (p-value: {:0.2e})".format(*stats.pearsonr(x,y))
+print "Avg. X (correlation):        {:>7.4f} +/- {:>5.2f}".format(np.average(x), np.std(x))
+print "Avg. Y (Combined - PWM AUC): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
+
+# 5B) Avg distance from StruM to FIMO PWM
+ax_c = plt.subplot(2,3,3)
+plt.hist(avgdist_data, bins=np.linspace(0,60,31), normed=True)
+ax_c.set_xlabel("Avg distance from top StruM\nmatch to sig PWM match (bp)", weight='bold')
+ax_c.set_ylabel("Frequency", weight='bold', ha='right')
+ax_c.yaxis.set_label_coords(-0.22, 0.75)
+
+#5D) FIMO Positions - single peak
+# Correlated
+ax_d = plt.subplot(2,2,3)
+fig5.text(0.01, 0.435, 'D', ha='left', va='top', weight='bold', fontsize=10)
+cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
+                          + "_fimo_v_strum_matches2.png")
+ax_d.set_title("TAL1", loc='left', fontsize=10)
+ax_d.imshow(cor_img)
+# ax_e.xaxis.set_visible(False)
+ax_d.yaxis.set_visible(False)
+xmin, xmax = ax_d.get_xlim()
+xticks = range(int(xmin), int(xmax+1), int((xmax-xmin)/4))
+xticks = np.linspace(xmin, xmax, 5)
+ax_d.set_xticks(xticks)
+ax_d.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
+
+#5E) FIMO Positions - flanking peaks
+# Flanking
+ax_e = plt.subplot(2,2,4)
+fig5.text(0.49, 0.435, 'E', ha='left', va='top', weight='bold', fontsize=10)
+flank_img = mpl.image.imread("output/" + "RFX1.ENCFF934JXG" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
+                                + "_fimo_v_strum_matches2.png")
+ax_e.set_title("RFX1", loc='left', fontsize=10)
+ax_e.imshow(flank_img)
+# ax_e.xaxis.set_visible(False)
+ax_e.yaxis.set_visible(False)
+xmin, xmax = ax_e.get_xlim()
+xticks = range(int(xmin), int(xmax+1), int((xmax-xmin)/4))
+xticks = np.linspace(xmin, xmax, 5)
+ax_e.set_xticks(xticks)
+ax_e.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
+
+
+# # Anti Correlated
+# ax_d = plt.subplot(3,1,4)
+# anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+#                           + "_fimo_v_strum_matches2.png")
+# ax_d.set_title("MEF2A", loc='left')
+# ax_d.imshow(anticor_img)
+# ax_d.xaxis.set_visible(False)
+# ax_d.yaxis.set_visible(False)
+
+# # Not Correlated
+# ax_e = plt.subplot(3,1,3)
+# rand_img = mpl.image.imread("output/" + "SNIP1.ENCFF772GVZ" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
+#                             + "_fimo_v_strum_matches2.png")
+# ax_e.set_title("SNIP1", loc='left')
+# ax_e.imshow(rand_img)
+# # ax_e.xaxis.set_visible(False)
+# ax_e.yaxis.set_visible(False)
+# xmin, xmax = ax_e.get_xlim()
+# xticks = range(int(xmin), int(xmax+1), int((xmax-xmin)/4))
+# xticks = np.linspace(xmin, xmax, 5)
+# ax_e.set_xticks(xticks)
+# ax_e.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
+
+# plt.subplots_adjust(left=0.1, bottom=0.075, right=0.9, top=0.975,
+#                 wspace=0.2, hspace=0.3)
+
+plt.subplots_adjust(left=0.075, bottom=0.05, right=0.95, top=0.95,
+                wspace=0.3, hspace=0.3)
+
+for ax in [ax_a, ax_c,]:
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+plt.savefig("figures/figure5.pdf", dpi=600)
+
+#####################################
+# Figure 6: Shape- vs. base-readout #
+#####################################
+
+# onecol = cm2inch(84/10.)
+# twocol = cm2inch(178/10.)
+# maxheight = cm2inch(230/10.)
+
+fig6 = plt.figure(figsize=[twocol, 1./3*twocol])
+# label_plots(fig6, 3, 1)
+
+# 6A) Specificity of shape- vs base-readout TFs
+ax_a = plt.subplot(1,3,1)
 
 # goi_seq = ['STAT', 'GATA']
 # goi_shp = ['TBP', 'LEF', 'RFX',]
@@ -555,47 +676,22 @@ for i,g,x,y,j in text:
 plt.legend(loc='upper left', fontsize='small', borderpad=0.2, labelspacing=0.2)
 plt.xlabel("PWM auROC", weight='bold')
 plt.ylabel("EM-StruM auROC", weight='bold')
-ax_b.yaxis.set_label_coords(-0.175,0.5)
+ax_a.yaxis.set_label_coords(-0.175,0.5)
+ax_a.set_aspect('equal', adjustable='box', anchor='C')
 
+# 6B)  Logit coefficients sorted by improvement over PWM AUC
 extra_colors = ['gold', 'skyblue']
 
-# 5C) Correlation of scores between sequence and shape models
-R = []
-for g in pknonpk_genes:
-    if g in corr:
-        R.append(corr[g])
-left = 0.1
-bottom = 0.16
+left=0.075
+bottom=0.15
+right=0.9
+top=0.9
+wspace=0.3
+hspace=0.3
 
-x = R
-y = log_pwm
-ax_c = fig5.add_axes((0.66+0.33*left, 0.5+0.5*bottom, 0.33*(0.8-left), 0.5*(0.8-bottom)))
-ax_pos = ax_c.get_position().bounds
-ax_top = fig5.add_axes((0.66+0.33*left, 0.5+0.5*0.8, ax_pos[2], 0.5*0.2), sharex=ax_c)
-ax_right = fig5.add_axes((0.66+0.33*0.8, 0.5+0.5*bottom, 0.33*0.2, ax_pos[3]), sharey=ax_c)
-ax_c.plot(x, y, '.', markersize=3, c='grey')
-ax_c.set_xlabel("Correlation between scores", weight='bold')
-ax_c.set_ylabel("$\\Delta$ AUC (logit-PWM)", weight='bold')
-ax_c.yaxis.set_label_coords(-0.175,0.5)
-ax_top.hist(x, bins=30, facecolor='grey')
-ax_right.hist(y, bins=30, facecolor='grey', orientation='horizontal')
-ax_top.axis('off')
-ax_right.axis('off')
-z = np.polyfit(x, y, 1)
-p = np.poly1d(z)
-minx = min(x)
-maxx = max(x)
-ax_c.plot([minx,maxx],p([minx,maxx]), c='red', lw=1.5)
-
-print_title("CORRELATION BETWEEN PWM AND STRUM SCORES")
-print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
-print "Correlation: {:0.3f} (p-value: {:0.2e})".format(*stats.pearsonr(x,y))
-print "Avg. X (correlation):        {:>7.4f} +/- {:>5.2f}".format(np.average(x), np.std(x))
-print "Avg. Y (Combined - PWM AUC): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
-
-# 5D)  Logit coefficients sorted by improvement over PWM AUC
-fig5.text(0.01, 0.45, 'D', ha='left', va='top', weight='bold', fontsize=10)
-ax_d = fig5.add_axes((0.07, 0.05, 0.86, 0.5*(0.9-bottom)))
+fig6.text(0.01, top + (1-top)/2., 'A', ha='left', va='top', weight='bold', fontsize=10)
+fig6.text(0.34, top + (1-top)/2., 'B', ha='left', va='top', weight='bold', fontsize=10)
+ax_b = fig6.add_axes((0.37, bottom, right-0.37, top-bottom))
 
 plt.ylabel("logit coefficients", weight='bold',)
 x = shuff_AUCs[:,4] - shuff_AUCs[:,0]
@@ -609,85 +705,59 @@ for i,g,xval,yval,j in text:
     y1 = shuff_coeffs[i,0]
     y2 = shuff_coeffs[i,3]
     yt = (y1+y2)/2.
+    ys = [y1,y2]
+    yt = ys[::-1][j]
     plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=1.5)
-    plt.text(xval, yt, g, dict(weight='bold', size='small', ha='right', va='center', rotation=90))#ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
+    plt.text(xval, yt, g, dict(weight='bold', size='small', ha='right',  va=['bottom', 'top', ][j], rotation=90))#ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
 # plt.legend(ncol=2, bbox_to_anchor=[0.0, 0.93], loc='upper left')
-ax_d2 = ax_d.twinx()
-ax_d2.tick_params('y', colors='r')
-ax_d2.set_ylabel("Combined - PWM ($\Delta$ AUC)", rotation=270, 
+ax_b2 = ax_b.twinx()
+ax_b2.tick_params('y', colors='r')
+ax_b2.set_ylabel("Combined - PWM ($\Delta$ AUC)", rotation=270, 
                  color='red', weight='bold', va='bottom',)
 l, = plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
 # plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
-ax_d.set_xticks([])
-ax_d.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
-ax_d2.legend(points, [coeff_labels[i] for i in [0,3]], bbox_to_anchor=[0.5, 1.0], loc='center', ncol=2, framealpha=1, facecolor='white')
+ax_b.set_xticks([])
+ax_b.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
+ax_b2.legend(points, [coeff_labels[i] for i in [0,3]], bbox_to_anchor=[0.5, 1.0], loc='center', ncol=2, framealpha=1, facecolor='white')
 
-ax_d.yaxis.set_label_coords(-0.045,0.5)
-ax_d2.yaxis.set_label_coords(1.05,0.5)
-
-plt.subplots_adjust(left=0.075, bottom=0.1, right=0.9, top=0.95,
-                wspace=0.3, hspace=0.25)
-
-for ax in [ax_a, ax_b, ax_d,]:
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-plt.savefig("figures/figure5.pdf")
+ax_b.yaxis.set_label_coords(-0.045,0.5)
+ax_b2.yaxis.set_label_coords(1.1,0.5)
 
 
-######################################################################
-# Figure 6: Distribution of significant StruM matches vs PWM matches #
-######################################################################
+#### Adjust Subplots
+plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top,
+                wspace=wspace, hspace=hspace)
 
-fig6 = plt.figure(figsize=[onecol, 0.8*twocol])
-label_plots(fig6, 3, 1)
+plt.savefig('figures/figure6.pdf')
 
-ax_a = plt.subplot(3,1,1)
-plt.hist(avgdist_data, bins=np.linspace(0,60,31), normed=True)
-
-# # Correlated
-# ax_b = plt.subplot(3,1,2)
-# cor_img = mpl.image.imread("output/" + "TAL1.ENCFF519DOC" # "eGFP-GTF2E2.ENCFF394WVZ" # "FOSL1.ENCFF961OPH"
-#                           + "_fimo_v_strum_matches2.png")
-# ax_b.set_title("TAL1", loc='left')
-# ax_b.imshow(cor_img)
-# ax_b.xaxis.set_visible(False)
-# ax_b.yaxis.set_visible(False)
-
-# Flanking
-ax_c = plt.subplot(3,1,2)
-flank_img = mpl.image.imread("output/" + "RFX1.ENCFF934JXG" # "eGFP-ZNF512.ENCFF617CTX" # ZBTB33.ENCFF681IOP
-                                + "_fimo_v_strum_matches2.png")
-ax_c.set_title("RFX1", loc='left')
-ax_c.imshow(flank_img)
-ax_c.xaxis.set_visible(False)
-ax_c.yaxis.set_visible(False)
+######################################################
 
 
-# # Anti Correlated
-# ax_d = plt.subplot(3,1,4)
-# anticor_img = mpl.image.imread("output/" + "MEF2A.ENCFF883WDT" # "RLF.ENCFF569QYK" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
-#                           + "_fimo_v_strum_matches2.png")
-# ax_d.set_title("MEF2A", loc='left')
-# ax_d.imshow(anticor_img)
-# ax_d.xaxis.set_visible(False)
-# ax_d.yaxis.set_visible(False)
+dist_data = dict(zip(avgdist_tfs, avgdist_data))
+x = [dist_data[g] for g in pknonpk_genes if g in dist_data]
+y = [shuff_AUCs[i,3] for i,g in enumerate(pknonpk_genes) if g in dist_data]
 
-# Not Correlated
-ax_e = plt.subplot(3,1,3)
-rand_img = mpl.image.imread("output/" + "SNIP1.ENCFF772GVZ" # "ATF4.ENCFF491DNM" # ATF2.ENCFF525YRJ
-                            + "_fimo_v_strum_matches2.png")
-ax_e.set_title("SNIP1", loc='left')
-ax_e.imshow(rand_img)
-# ax_e.xaxis.set_visible(False)
-ax_e.yaxis.set_visible(False)
-xmin, xmax = ax_e.get_xlim()
-xticks = range(int(xmin), int(xmax+1), int((xmax-xmin)/4))
-xticks = np.linspace(xmin, xmax, 5)
-ax_e.set_xticks(xticks)
-ax_e.set_xticklabels(['-100', '0\nPWM Position (bp)', '+/-100', '0\nStruM Position (bp)', '+100'])
 
-plt.subplots_adjust(left=0.1, bottom=0.075, right=0.9, top=0.975,
-                wspace=0.2, hspace=0.3)
-plt.savefig('figures/figure6.pdf', dpi=600)
 
+sfig = plt.figure(figsize=(onecol, onecol))
+plt.plot(x, y, '.', color=(169/256.,169/256.,169/256.))
+
+z = np.polyfit(x, y, 1)
+p = np.poly1d(z)
+minx = min(x)
+maxx = max(x)
+
+plt.plot([minx,maxx],p([minx,maxx]), c='red', lw=1.5)
+plt.xlabel("Avg distance between best StruM score\nand nearest FIMO position")
+plt.ylabel("EM-StruM auROC (shuff)")
+plt.tight_layout()
+
+r,p = stats.pearsonr(x,y)
+
+print_title("RELATION BETWEEN DISTANCE FROM FIMO-PWM SITE AND EM-STRUM PERFORMANCE")
+print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
+print "Correlation: {:0.3f} (p-value: {:0.2e})".format(r, p)
+print "Avg. X (Avg Dist):               {:>7.4f} +/- {:>5.2f}".format(np.average(x), np.std(x))
+print "Avg. Y (EM-StruM auROC (shuff)): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
+
+plt.savefig('Supplemental/fimo_perf.pdf')
