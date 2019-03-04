@@ -31,11 +31,17 @@ mkdir src
 cd src
 git clone https://github.com/pdeford/StructuralMotifs.git
 
-conda create -n strum_paper python=2.7
+conda create -n strum_paper python=2.7.15
 source activate strum_paper
-conda install bedtools samtools meme \
-    matplotlib numpy scipy scikit-learn=0.20.1 biopython \
-    requests libiconv
+conda install -c bioconda \
+    bedtools=2.27.1 biopython=1.68 meme=4.12.0 \
+    regex=2016.06.24 samtools=1.9
+conda install -c default \
+    matplotlib=2.2.3 numpy=1.15.4 scikit-learn=0.20.1 \
+    scipy=1.1.0 cython=0.29.2 python-dateutil=2.7.5 \
+    requests=2.20.1 libiconv=1.15
+conda install -c conda-forge \
+    rdflib=4.2.2
 cd StructuralMotifs
 python setup.py install
 cd ../..
