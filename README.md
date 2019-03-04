@@ -1,6 +1,6 @@
-# StruMs: A flexible and extensible model of TF-DNA interactions
+# DNA shape complements sequence-based representations of transcription factor binding sites
 
-This GitHub repository is associated with the paper _StruMs: A flexible and extensible model of TF-DNA interactions_ by P. DeFord and J. Taylor, and reproduces all of the analysis and figures from that paper.
+This GitHub repository is associated with the paper _DNA shape complements sequence-based representations of transcription factor binding sites_ by P. DeFord and J. Taylor, and reproduces all of the analysis and figures from that paper.
 
 This analysis relies heavily on the **StruM package**. Source code, installation instructions, and documentation can be found [here](https://github.com/pdeford/StructuralMotifs).
 
