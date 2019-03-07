@@ -121,3 +121,6 @@ ls data/CTCF.ENCFF??????.fa | while read line;
 do 
 	python scripts/filter-test.py $line; 
 done > Supplemental/filt.txt
+
+####################################
+python scripts/summarize_accessions.py > Supplemental/accessions.tsv
