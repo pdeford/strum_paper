@@ -149,7 +149,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
     data /= (scaler[1] - scaler[0])
 
     ## Train the model
-    clf = logit()
+    clf = logit(solver='liblinear')
     # cv = StratifiedKFold(y,n_folds=10)  # Version 0.17.1
     cv = StratifiedKFold(n_splits=10)     # Version 0.20.1
     tprs = []
@@ -157,6 +157,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
     aucs = []
     prcaucs = []
     mean_fpr = np.linspace(0, 1, 100)
+    data = data[:, [0,3]]
     # for train, test in cv:              # Version 0.17.1
     for train, test in cv.split(data, y): # Version 0.20.1
         probas_ = clf.fit(data[train], y[train]).predict_proba(data[test])
@@ -187,13 +188,14 @@ def score_all(basename, n_process, random_seed, models, sequences):
     working_x /= (scaler2[1] - scaler2[0])
 
     ## Train the model
-    clf2 = logit()
+    clf2 = logit(solver='liblinear')
     # cv2 = StratifiedKFold(working_y, n_folds=10)      # Version 0.17.1
     cv2 = StratifiedKFold(n_splits=10)                  # Version 0.20.1
 
     tprs = []
     aucs = []
     mean_fpr = np.linspace(0, 1, 100)
+    working_x = working_x[:, [0,3]]
     # for train, test in cv2:                           # Version 0.17.1
     for train, test in cv2.split(working_x, working_y): # Version 0.20.1
         probas_ = clf2.fit(working_x[train], working_y[train]).predict_proba(working_x[test])
