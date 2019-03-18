@@ -149,7 +149,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
     data /= (scaler[1] - scaler[0])
 
     ## Train the model
-    clf = logit()
+    clf = logit(solver='lbfgs')
     # cv = StratifiedKFold(y,n_folds=10)  # Version 0.17.1
     cv = StratifiedKFold(n_splits=10)     # Version 0.20.1
     tprs = []
@@ -187,7 +187,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
     working_x /= (scaler2[1] - scaler2[0])
 
     ## Train the model
-    clf2 = logit()
+    clf2 = logit(solver='lbfgs')
     # cv2 = StratifiedKFold(working_y, n_folds=10)      # Version 0.17.1
     cv2 = StratifiedKFold(n_splits=10)                  # Version 0.20.1
 
