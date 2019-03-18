@@ -115,3 +115,12 @@ python scripts/generate_figures.py \
 	-c output/coefficents.txt \
 	-s output/specificities.txt \
 	> RESULTS.txt
+
+####################################
+ls data/CTCF.ENCFF??????.fa | while read line; 
+do 
+	python scripts/filter-test.py $line; 
+done > Supplemental/filt.txt
+
+####################################
+python scripts/summarize_accessions.py > Supplemental/accessions.tsv
