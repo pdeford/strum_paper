@@ -4,14 +4,12 @@ import numpy as np
 import random
 import sys
 
-#from sklearn.linear_model import LogisticRegression as logit
 
 try:
 	import cPickle as pickle
 except:
 	import pickle
 
-# import StruM
 N = 1000
 
 # Set up indexes for defining the weight matrices
