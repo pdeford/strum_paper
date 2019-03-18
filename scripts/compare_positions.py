@@ -185,7 +185,7 @@ def main(basename, n_process=1):
 	plt.figure()
 	plt.hist(diffs, bins=30)
 	ax = plt.gca()
-	ax.tick_params(labelleft='off') 
+	ax.tick_params(labelleft=False) 
 	plt.xlabel("Distance to nearest match (bp)")
 	plt.savefig("output/{}_fimo_v_strum_dist.pdf".format(basename))
 	plt.close()
