@@ -10,6 +10,7 @@ import argparse
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import matplotlib.patheffects as pe
 
 import numpy as np
 import string
@@ -94,7 +95,7 @@ for line in args.positions:
 
 ## Logit model coefficients
 f = args.coefficients
-coeff_labels = ["PWM", "DWM", "ML-StruM", "EM-StruM"]
+coeff_labels = ["PWM", "EM-StruM"]
 coeff_genes = []
 shuff_coeffs, flank_coeffs = [], []
 while True:
@@ -103,8 +104,7 @@ while True:
     if not l1:
         break
     coeff_genes.append(l1.split()[0])
-    shuff_coeffs.append([float(x) for x in l1.split()[1:6]])
-    # flank_coeffs.append([float(x) for x in l2.split()[1:6]])
+    shuff_coeffs.append([float(x) for x in l1.split()[1:]])
 
 shuff_coeffs = np.asarray(shuff_coeffs)
 auc_coeff_idx = {}
@@ -133,7 +133,7 @@ spec_data = np.asarray(spec_data)
 # Functions to make plotting figures easier
 ######################################################################
 
-plt.rcParams.update({'font.size': 10, 'font.family':'serif', 'font.serif':['Times New Roman']})
+plt.rcParams.update({'font.size': 10, 'font.family':'sans-serif', 'font.sans-serif':['Arial', 'Helvetica']})
 # props = {'color':'white', 'linestyle':'-', 'zorder':9, 'linewidth':3.5}
 props2 = {'color':'black', 'linestyle':'-', 'zorder':10, 'linewidth':2}
 colors = ["darkorange", "#fb9a99", "seagreen", "steelblue", "mediumpurple"]
@@ -309,13 +309,17 @@ seq = [x.strip(string.ascii_lowercase).replace("X", "N") for x in seq]
 
 motif.train(seq, fasta=False)
 
+print_title('PWM FOR FOXA1 (MA0148.1)')
+
 motif.PWM *= 100
 pwm = biomotifs.read(motif.print_PWM().split('\n'), 'pfm')
-pwm.weblogo(
-    "output/FOXA1_PWM.png", show_errorbars=False, 
-    color_scheme='color_classic', format='png_print')
-
-motif.plot("output/FOXA1_StruM.png")
+##### UNCOMMENT THIS FROM HERE #####
+# pwm.weblogo(
+#     "output/FOXA1_PWM.png", show_errorbars=False, 
+#     color_scheme='color_classic', format='png_print')
+# 
+# motif.plot("output/FOXA1_StruM.png")
+##### TO HERE #####
 
 # fig2, (ax_a, ax_b) = plt.subplots(2, 1, gridspec_kw = {'height_ratios':[1, 4]}, 
 #                            figsize=[onecol, 1.2*onecol])
@@ -610,7 +614,11 @@ plt.savefig("figures/figure5.pdf", dpi=600)
 # twocol = cm2inch(178/10.)
 # maxheight = cm2inch(230/10.)
 
-fig6 = plt.figure(figsize=[twocol, 1./3*twocol])
+oldheight = 1./3
+newheight = 2./5
+
+coeff_colors = ['#ff7f00', '#33a02c', '#6a3d9a', '#1f78b4']
+fig6 = plt.figure(figsize=[twocol, newheight*twocol])
 # label_plots(fig6, 3, 1)
 
 # 6A) Specificity of shape- vs base-readout TFs
@@ -621,7 +629,7 @@ ax_a = plt.subplot(1,3,1)
 goi_seq = [
     "STAT", "NFAT", "GATA", # Definitely in the dataset
     "BHTH", "homeodomains", # Classes of proteins
-        "CTCF", "CTCFL", #"DNMT1", "E4F1", "GATA2", "HINFP", "KLF13", # Zinc fingers
+        "CTCF", #"CTCFL", #"DNMT1", "E4F1", "GATA2", "HINFP", "KLF13", # Zinc fingers
         #"KLF1", "VEZF1", "ZBTB40", "ZFX", "EGR1", "GATA1", "GATAD2A", # Zinc fingers
         #"GATAD2B", "IKZF1", "KLF16", "MTA1", "MYNN", "PRDM10", "REST", # Zinc fingers
         #"RLF", "SP1", "THAP1", "ZBED1", "ZBTB2", "ZBTB33", "ZBTB5", # Zinc fingers
@@ -663,15 +671,17 @@ for subg in goi_shp:
             roi_shp[i] = True
             text.append((i, g, pwm_auc[i], strum_auc[i], 1))
 
+extra_colors = ["#fdbf6f", "#a6cee3"]#['gold', 'skyblue']
 plt.plot(pwm_auc, strum_auc, '.', c=(169/256.,169/256.,169/256.), markersize=3,)
-plt.plot(pwm_auc[roi_seq], strum_auc[roi_seq], markers[0], 
-         c=colors[0], ms=3, label='Sequence')
-plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[3], 
-         c=colors[3], ms=3, label='Shape')
 plt.plot(plt.xlim(), plt.ylim(), '--', c='grey')
+plt.plot(pwm_auc[roi_seq], strum_auc[roi_seq], markers[1], 
+         markerfacecolor=extra_colors[0], markeredgecolor='k', markeredgewidth=0.5, ms=4, label='Sequence')
+plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[2], 
+         markerfacecolor=extra_colors[1], markeredgecolor='k', markeredgewidth=0.5, ms=4, label='Shape')
 
-for i,g,x,y,j in text:
-    plt.text(x, y, g, dict(weight='bold', size='x-small', ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
+
+# for i,g,x,y,j in text:
+#     plt.text(x, y, g, dict(weight='bold', size='x-small', ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
 
 plt.legend(loc='upper left', fontsize='small', borderpad=0.2, labelspacing=0.2)
 plt.xlabel("PWM auROC", weight='bold')
@@ -680,49 +690,123 @@ ax_a.yaxis.set_label_coords(-0.175,0.5)
 ax_a.set_aspect('equal', adjustable='box', anchor='C')
 
 # 6B)  Logit coefficients sorted by improvement over PWM AUC
-extra_colors = ['gold', 'skyblue']
 
+
+z = (newheight-oldheight)
 left=0.075
-bottom=0.15
+# bottom=0.15
+bottom= (z + 0.15*oldheight)/(newheight)
 right=0.9
-top=0.9
+# top=0.9
+top = (z + 0.9*oldheight)/(newheight)
 wspace=0.3
 hspace=0.3
 
 fig6.text(0.01, top + (1-top)/2., 'A', ha='left', va='top', weight='bold', fontsize=10)
 fig6.text(0.34, top + (1-top)/2., 'B', ha='left', va='top', weight='bold', fontsize=10)
 ax_b = fig6.add_axes((0.37, bottom, right-0.37, top-bottom))
+ax_below = fig6.add_axes((0.37, 0.0, right-0.37, bottom), sharex=ax_b)
+ax_below.set_ylim((0,1))
 
-plt.ylabel("logit coefficients", weight='bold',)
+ax_b.set_ylabel("logit coefficients", weight='bold',)
 x = shuff_AUCs[:,4] - shuff_AUCs[:,0]
 idx = np.argsort(x)
+
 points = []
-for i in [0,3]:#range(4):
-    p, = plt.plot(shuff_coeffs[:,i][idx], markers[i], c=colors[i], label=coeff_labels[i], markersize=3)
+for i in [0,1]:#range(4):
+    p, = ax_b.plot(shuff_coeffs[:,i][idx], markers[i], c=coeff_colors[i], label=coeff_labels[i], markersize=3)
     points.append(p)
-for i,g,xval,yval,j in text:
+
+text = sorted(text, key=lambda x:(np.where(idx==x[0])[0]))
+
+
+print_title("INFERRING READOUT MECHANISMS")
+a = shuff_coeffs[:,0]
+b = shuff_coeffs[:,1]
+print "Number of experiments in which the logit model favors:"
+print "(Any difference)"
+print "- StruMs:  {}".format(sum(b > a))
+print "- Neither: {}".format(sum(b == a))
+print "- PWMs:    {}".format(sum(b < a))
+
+print "(Two fold difference)"
+print "- StruMs:  {}".format(sum((b / a) > 2)) ## TO DO: I NEED TO THINK ABOUT HOW THIS IS AFFECTED BY NEGATIVE VALUES
+print "- Neither: {}".format(sum(((b / a) <= 2) & ((b / a) >= 0.5)))
+print "- PWMs:    {}".format(sum((b / a) < 0.5))
+
+minx, maxx = ax_b.get_xlim()
+rangex = maxx-minx
+c_width = 0.02*rangex
+cluster_spacing = []
+
+curr_clust = [ np.where(idx==text[0][0])[0][0], ]
+curr_genes = [text[0][1],]
+cmin = minx
+i = 1
+while i < len(text):
+    ii = text[i][0]
+    xval = np.where(idx==ii)[0][0]
+    c_bottom = max(
+                np.mean(curr_clust) - (c_width*2)*(len(curr_clust)/2.),
+                cmin )
+    if (xval) < (c_bottom + (c_width*2)*(len(curr_clust) + 0.5)):
+        curr_clust.append(xval)
+        curr_genes.append(text[i][1])
+        i += 1
+    else:
+        for j,val in enumerate(curr_clust):
+            cluster_spacing.append(c_bottom+j*(c_width*2))
+        curr_clust = [ xval, ]
+        curr_genes = [text[i][1]]
+        cmin = c_bottom + (c_width*2)*(len(curr_clust) + 0.5)
+        i += 1
+c_bottom = max(
+            np.mean(curr_clust) - (c_width*2)*(len(curr_clust)/2.),
+            cmin )
+for j,val in enumerate(curr_clust):
+    cluster_spacing.append(c_bottom+j*(c_width*2))
+
+for ii, (i,g,xval,yval,j) in enumerate(text):
     xval = np.where(idx==i)[0]
     y1 = shuff_coeffs[i,0]
-    y2 = shuff_coeffs[i,3]
+    y2 = shuff_coeffs[i,1]
     yt = (y1+y2)/2.
     ys = [y1,y2]
     yt = ys[::-1][j]
-    plt.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=1.5)
-    plt.text(xval, yt, g, dict(weight='bold', size='small', ha='right',  va=['bottom', 'top', ][j], rotation=90))#ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
-# plt.legend(ncol=2, bbox_to_anchor=[0.0, 0.93], loc='upper left')
+    ax_b.plot([xval,xval], [y1,y2], '-', color=extra_colors[j], linewidth=1.5, 
+                path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
+    ax_b.plot([xval], [y1], 'd', ms=5, markerfacecolor=coeff_colors[0],
+         markeredgecolor=extra_colors[j], path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
+    ax_b.plot([xval], [y2], 'o', ms=5, markerfacecolor=coeff_colors[3],
+         markeredgecolor=extra_colors[j], path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
+    # ax_b.text(xval, yt, g, dict(weight='bold', size='small', ha='right',  va=['bottom', 'top', ][j], rotation=90))#ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
+    c_pos = cluster_spacing[ii] + c_width
+    ax_below.plot([xval, xval, c_pos, c_pos], [1.0, 0.95,0.85,0.81], 'k-', linewidth=0.5)
+    ax_below.text(c_pos, 0.8, g, 
+                    dict(weight='bold', size='small', ha='center',  
+                        va='top', rotation=90,),
+                    bbox=dict(facecolor=extra_colors[j], pad=1, edgecolor='None')
+                    )
+    # bbox=dict(facecolor='red', alpha=0.5)
 ax_b2 = ax_b.twinx()
 ax_b2.tick_params('y', colors='r')
 ax_b2.set_ylabel("Combined - PWM ($\Delta$ AUC)", rotation=270, 
                  color='red', weight='bold', va='bottom',)
 l, = plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
-# plt.legend(loc='upper left', bbox_to_anchor=[0.0, 1])
 ax_b.set_xticks([])
 ax_b.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
 ax_b2.legend(points, [coeff_labels[i] for i in [0,3]], bbox_to_anchor=[0.5, 1.0], loc='center', ncol=2, framealpha=1, facecolor='white')
 
 ax_b.yaxis.set_label_coords(-0.045,0.5)
 ax_b2.yaxis.set_label_coords(1.1,0.5)
+ax_b.xaxis.set_label_coords(0.5,0.08)
+# ax_a.xaxis.set_label_coords(0.5,0.08)
 
+ax_below.spines["top"].set_visible(False)
+ax_below.spines["right"].set_visible(False)
+ax_below.spines["left"].set_visible(False)
+ax_below.spines["bottom"].set_visible(False)
+ax_below.set_yticks([])
 
 #### Adjust Subplots
 plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top,
