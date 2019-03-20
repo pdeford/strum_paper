@@ -95,7 +95,7 @@ for line in args.positions:
 
 ## Logit model coefficients
 f = args.coefficients
-coeff_labels = ["PWM", "EM-StruM"]
+coeff_labels = ["PWM", "StruM"]
 coeff_genes = []
 shuff_coeffs, flank_coeffs = [], []
 while True:
@@ -136,8 +136,8 @@ spec_data = np.asarray(spec_data)
 plt.rcParams.update({'font.size': 10, 'font.family':'sans-serif', 'font.sans-serif':['Arial', 'Helvetica']})
 # props = {'color':'white', 'linestyle':'-', 'zorder':9, 'linewidth':3.5}
 props2 = {'color':'black', 'linestyle':'-', 'zorder':10, 'linewidth':2}
-colors = ["darkorange", "#fb9a99", "seagreen", "steelblue", "mediumpurple"]
-markers = ['d', '^', 's', 'o', '*']
+colors = ["darkorange", "seagreen", "steelblue", "mediumpurple"]
+markers = ['d', '^', 's', 'o',]
 
 def cm2inch(value):
     return value/2.54
@@ -172,7 +172,7 @@ def jitter(row, nbins=30, binsize=None, vmin=None, vmax=None):
         xs[bins == i] = np.random.permutation(pool[:bincounts[i]])
     return xs
 
-def plot_box(data, labels, title=None):
+def plot_box(data, labels, colors, title=None):
     plt.boxplot(data, notch=False, boxprops=props2, whiskerprops=props2, medianprops=props2, sym='')
     plt.xticks(range(1, len(labels)+1), labels,)
     plt.ylim([0,1])
@@ -362,7 +362,7 @@ label_plots(fig3, 1, 2)
 ax_a =  fig3.add_subplot(1, 2, 1)
 x1 = spec_data[:,0]
 y1 = spec_data[:,2]
-plot_box(data=np.vstack([x1,y1]).T, labels=["Cross\nFamily", "Control"], title="auROC")
+plot_box(data=np.vstack([x1,y1]).T, labels=["Cross\nFamily", "Control"], colors=['steelblue', 'darkorange'], title="auROC")
 # for tick in ax_a.get_xticklabels():
 #     tick.set_rotation(20)
 
@@ -370,7 +370,7 @@ plot_box(data=np.vstack([x1,y1]).T, labels=["Cross\nFamily", "Control"], title="
 ax_b =  fig3.add_subplot(1, 2, 2)
 x2 = spec_data[:,1]
 y2 = spec_data[:,3]
-plot_box(data=np.vstack([x2,y2]).T, labels=["Cross\nFamily", "Control"], title="auPRC")
+plot_box(data=np.vstack([x2,y2]).T, labels=["Cross\nFamily", "Control"], colors=['steelblue', 'darkorange'], title="auPRC")
 # for tick in ax_b.get_xticklabels():
 #     tick.set_rotation(20)
 
@@ -413,8 +413,8 @@ pval_labels = ['P', 'D', 'S', 'C']
 # 4A) auROCs of motifs using shuffled sequence as background
 ax_a = plt.subplot(2,2,1)
 plt.title("Shuffled background", weight='bold')
-# plot_box(shuff_AUCs, pknonpk_labels)
-plot_box(shuff_AUCs[:,[0,1,3,4]], pknonpk_labels)
+# plot_box(shuff_AUCs, pknonpk_labels, colors)
+plot_box(shuff_AUCs[:,[0,1,3,4]], pknonpk_labels, colors)
 plt.ylabel("auROC", weight='bold')
 
 ## STATISTICS
@@ -426,7 +426,7 @@ plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_a, cbar=False)
 # 4B) auROCs of motifs using flanking sequence as background
 ax_b = plt.subplot(2,2,2)
 plt.title("Flanking background", weight='bold')
-plot_box(flank_AUCs[:,[0,1,3,4]], pknonpk_labels)
+plot_box(flank_AUCs[:,[0,1,3,4]], pknonpk_labels, colors)
 # plt.ylabel("auROC", weight='bold')
 
 ## STATISTICS
@@ -437,7 +437,7 @@ plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_b)
 
 # 4C) auPRCs of motifs using shuffled sequence as background
 ax_c = plt.subplot(2,2,3)
-plot_box(shuff_PRCs[:,[0,1,3,4]], pknonpk_labels)
+plot_box(shuff_PRCs[:,[0,1,3,4]], pknonpk_labels, colors)
 plt.ylabel("auPRC", weight='bold')
 
 ## STATISTICS
@@ -448,7 +448,7 @@ plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_c, cbar=False)
 
 # 4D) auPRCs of motifs using flanking sequence as background
 ax_d = plt.subplot(2,2,4)
-plot_box(flank_PRCs[:,[0,1,3,4]], pknonpk_labels)
+plot_box(flank_PRCs[:,[0,1,3,4]], pknonpk_labels, colors)
 # plt.ylabel("auPRC", weight='bold')
 
 ## STATISTICS
@@ -692,7 +692,7 @@ plt.plot(pwm_auc[roi_shp], strum_auc[roi_shp], markers[2],
 
 plt.legend(loc='upper left', fontsize='small', borderpad=0.2, labelspacing=0.2)
 plt.xlabel("PWM auROC", weight='bold')
-plt.ylabel("EM-StruM auROC", weight='bold')
+plt.ylabel("StruM auROC", weight='bold')
 ax_a.yaxis.set_label_coords(-0.175,0.5)
 ax_a.set_aspect('equal', adjustable='box', anchor='C')
 
@@ -840,7 +840,7 @@ maxx = max(x)
 
 plt.plot([minx,maxx],p([minx,maxx]), c='red', lw=1.5)
 plt.xlabel("Avg distance between best StruM score\nand nearest FIMO position")
-plt.ylabel("EM-StruM auROC (shuff)")
+plt.ylabel("StruM auROC (shuff)")
 plt.tight_layout()
 
 r,p = stats.pearsonr(x,y)
@@ -849,6 +849,6 @@ print_title("RELATION BETWEEN DISTANCE FROM FIMO-PWM SITE AND EM-STRUM PERFORMAN
 print "Eqn of the line:   y = {:0.3f} x + {:0.3f}".format(z[0], z[1])
 print "Correlation: {:0.3f} (p-value: {:0.2e})".format(r, p)
 print "Avg. X (Avg Dist):               {:>7.4f} +/- {:>5.2f}".format(np.average(x), np.std(x))
-print "Avg. Y (EM-StruM auROC (shuff)): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
+print "Avg. Y (StruM auROC (shuff)): {:>7.4f} +/- {:>5.2f}".format(np.average(y), np.std(y))
 
 plt.savefig('Supplemental/fimo_perf.pdf')
