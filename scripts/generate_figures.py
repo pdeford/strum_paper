@@ -421,7 +421,7 @@ plt.ylabel("auROC", weight='bold')
 print_title("Difference in auROCs, shuffled background")
 t_vals, p_vals = do_ttest(shuff_AUCs, pknonpk_labels2)
 #plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_a, cbar=False)
-plot_pvals(p_vals[[0,1,3,4],[0,1,3,4]], pval_labels, ax_a, cbar=False)
+plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_a, cbar=False)
 
 # 4B) auROCs of motifs using flanking sequence as background
 ax_b = plt.subplot(2,2,2)
