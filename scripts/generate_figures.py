@@ -55,8 +55,8 @@ args = parser.parse_args()
 ## AUCs from Peak v. Non-Peak comparison
 ## Uses 2 sets of background sequences
 f = args.auc
-pknonpk_labels = ['PWM', 'DWM', 'ML\nStruM', 'EM\nStruM', 'Combined']
-pknonpk_labels2 = ['PWM', 'DWM', 'ML-StruM', 'EM-StruM', 'Combined']
+pknonpk_labels = ['PWM', 'DWM', 'StruM', 'Combined']
+pknonpk_labels2 = ['PWM', 'DWM', 'MEME-StruM', '(de Novo) StruM', 'Combined']
 shuff_AUCs, flank_AUCs, pknonpk_genes = [], [], []
 shuff_PRCs, flank_PRCs = [], []
 while True:
@@ -414,7 +414,7 @@ pval_labels = ['P', 'D', 'S', 'C']
 ax_a = plt.subplot(2,2,1)
 plt.title("Shuffled background", weight='bold')
 # plot_box(shuff_AUCs, pknonpk_labels)
-plot_box(shuff_AUCs[:,[0,1,3,4]], pknonpk_labels[:2]+pknonpk_labels[3:])
+plot_box(shuff_AUCs[:,[0,1,3,4]], pknonpk_labels)
 plt.ylabel("auROC", weight='bold')
 
 ## STATISTICS
@@ -426,33 +426,36 @@ plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_a, cbar=False)
 # 4B) auROCs of motifs using flanking sequence as background
 ax_b = plt.subplot(2,2,2)
 plt.title("Flanking background", weight='bold')
-plot_box(flank_AUCs, pknonpk_labels)
+plot_box(flank_AUCs[:,[0,1,3,4]], pknonpk_labels)
 # plt.ylabel("auROC", weight='bold')
 
 ## STATISTICS
 print_title("Difference in auROCs, flanking seq as background")
 t_vals, p_vals = do_ttest(flank_AUCs, pknonpk_labels2)
-plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_b)
+# plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_b)
+plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_b)
 
 # 4C) auPRCs of motifs using shuffled sequence as background
 ax_c = plt.subplot(2,2,3)
-plot_box(shuff_PRCs, pknonpk_labels)
+plot_box(shuff_PRCs[:,[0,1,3,4]], pknonpk_labels)
 plt.ylabel("auPRC", weight='bold')
 
 ## STATISTICS
 print_title("Difference in auPRCs, shuffled background")
 t_vals, p_vals = do_ttest(shuff_PRCs, pknonpk_labels2)
-plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_c, cbar=False)
+# plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_c, cbar=False)
+plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_c, cbar=False)
 
 # 4D) auPRCs of motifs using flanking sequence as background
 ax_d = plt.subplot(2,2,4)
-plot_box(flank_PRCs, pknonpk_labels)
+plot_box(flank_PRCs[:,[0,1,3,4]], pknonpk_labels)
 # plt.ylabel("auPRC", weight='bold')
 
 ## STATISTICS
 print_title("Difference in auPRCs, flanking seq as background")
 t_vals, p_vals = do_ttest(flank_PRCs, pknonpk_labels2)
-plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_d)
+# plot_pvals(p_vals, [x[0] for x in pknonpk_labels], ax_d)
+plot_pvals(p_vals[[0,1,3,4]][:,[0,1,3,4]], pval_labels, ax_d)
 
 plt.subplots_adjust(left=0.075, bottom=0.1, right=0.95, top=0.95,
                 wspace=0.2, hspace=0.3)
