@@ -314,11 +314,11 @@ print_title('PWM FOR FOXA1 (MA0148.1)')
 motif.PWM *= 100
 pwm = biomotifs.read(motif.print_PWM().split('\n'), 'pfm')
 ##### UNCOMMENT THIS FROM HERE #####
-# pwm.weblogo(
-#     "output/FOXA1_PWM.png", show_errorbars=False, 
-#     color_scheme='color_classic', format='png_print')
-# 
-# motif.plot("output/FOXA1_StruM.png")
+pwm.weblogo(
+    "output/FOXA1_PWM.png", show_errorbars=False, 
+    color_scheme='color_classic', format='png_print')
+
+motif.plot("output/FOXA1_StruM.png")
 ##### TO HERE #####
 
 # fig2, (ax_a, ax_b) = plt.subplots(2, 1, gridspec_kw = {'height_ratios':[1, 4]}, 
@@ -617,7 +617,7 @@ plt.savefig("figures/figure5.pdf", dpi=600)
 oldheight = 1./3
 newheight = 2./5
 
-coeff_colors = ['#ff7f00', '#33a02c', '#6a3d9a', '#1f78b4']
+coeff_colors = ['#ff7f00', '#1f78b4']#['#ff7f00', '#33a02c', '#6a3d9a', '#1f78b4']
 fig6 = plt.figure(figsize=[twocol, newheight*twocol])
 # label_plots(fig6, 3, 1)
 
@@ -713,8 +713,8 @@ x = shuff_AUCs[:,4] - shuff_AUCs[:,0]
 idx = np.argsort(x)
 
 points = []
-for i in [0,1]:#range(4):
-    p, = ax_b.plot(shuff_coeffs[:,i][idx], markers[i], c=coeff_colors[i], label=coeff_labels[i], markersize=3)
+for i in [0,1]:
+    p, = ax_b.plot(shuff_coeffs[:,i][idx], markers[[0,3][i]], c=coeff_colors[i], label=coeff_labels[i], markersize=3)
     points.append(p)
 
 text = sorted(text, key=lambda x:(np.where(idx==x[0])[0]))
@@ -777,7 +777,7 @@ for ii, (i,g,xval,yval,j) in enumerate(text):
                 path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
     ax_b.plot([xval], [y1], 'd', ms=5, markerfacecolor=coeff_colors[0],
          markeredgecolor=extra_colors[j], path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
-    ax_b.plot([xval], [y2], 'o', ms=5, markerfacecolor=coeff_colors[3],
+    ax_b.plot([xval], [y2], 'o', ms=5, markerfacecolor=coeff_colors[1],
          markeredgecolor=extra_colors[j], path_effects=[pe.Stroke(linewidth=2, foreground='k'), pe.Normal()])
     # ax_b.text(xval, yt, g, dict(weight='bold', size='small', ha='right',  va=['bottom', 'top', ][j], rotation=90))#ha=['left', 'right'][(j+i)%2], va=['top', 'bottom'][(j+i)%2]))
     c_pos = cluster_spacing[ii] + c_width
@@ -795,7 +795,7 @@ ax_b2.set_ylabel("Combined - PWM ($\Delta$ AUC)", rotation=270,
 l, = plt.plot(x[idx], 'r-', label="Combined - PWM ($\Delta$ AUC)")
 ax_b.set_xticks([])
 ax_b.set_xlabel("Ranked by $\Delta$ AUC", weight='bold')
-ax_b2.legend(points, [coeff_labels[i] for i in [0,3]], bbox_to_anchor=[0.5, 1.0], loc='center', ncol=2, framealpha=1, facecolor='white')
+ax_b2.legend(points, [coeff_labels[i] for i in [0,1]], bbox_to_anchor=[0.5, 1.0], loc='center', ncol=2, framealpha=1, facecolor='white')
 
 ax_b.yaxis.set_label_coords(-0.045,0.5)
 ax_b2.yaxis.set_label_coords(1.1,0.5)
