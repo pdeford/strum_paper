@@ -2,7 +2,6 @@
 
 import rdflib
 from rdflib import Graph, URIRef, Literal
-import string
 
 
 import regex as re
