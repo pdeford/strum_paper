@@ -36,7 +36,7 @@ HEADERS = {'accept': 'application/json'}
 
 # This searches the ENCODE database
 base = "https://www.encodeproject.org"
-URL = base + "/search/?assay_title=ChIP-seq&target.investigated_as=transcription+factor&limit=all&assembly=hg19&biosample_term_name={}".format(celltype)
+URL = base + "/search/?assay_title=ChIP-seq&target.investigated_as=transcription+factor&limit=all&assembly=hg19&biosample_ontology.term_name=K562={}".format(celltype)
 
 # Extract the JSON response as a python dict
 response_json_dict = query(URL)
