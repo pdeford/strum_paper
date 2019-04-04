@@ -28,8 +28,8 @@ def main(tf, seed):
 
 	scores = []
 	for kmer in sequences:
-		s1 = score_PWM(pwm, kmer)
-		s2 = score_DWM(dwm, kmer)
+		s1 = score_pwm(pwm, kmer)
+		s2 = score_dwm(dwm, kmer)
 		scores.append((s1, s2))
 	s3 = ml_strum.score_seq_filt(sequence)
 	s4 = em_strum.score_seq_filt(sequence)
@@ -41,24 +41,20 @@ def main(tf, seed):
 	idx = np.triu_indices(4, 1)
 	print "{}\t".format(tf) + "\t".join(["{:0.3f}".format(x) for x in coef[idx]])
 
-def score_PWM(PWM, kmer):
-	"""Score a kmer with a given PWM, and return log2 of the score."""
-	p = np.sum([ PWM[nuc_index[n],j] for j,n in enumerate(kmer)])
-	return p
-	#return np.log(p/np.product([0.25]*PWM.shape[1]))
-	return np.log2(p)
+def score_pwm(PWM, kmer):
+    """Score a kmer with a given PWM, and return log2 of the score."""
+    p = np.product([ PWM[nuc_index[n],j] for j,n in enumerate(kmer)])
+    return np.log2(p)
 
-def score_DWM(DWM, kmer):
-	"""Score a kmer with a given DWM, and return log2 of the score."""
-	p = DWM[nuc_index[kmer[0]],0]
-	for j,n in enumerate(kmer):
-		if j == 0:
-			continue
-		di = kmer[j-1:j+1]
-		p += DWM[di_index[di],j]
-	return p
-	#return np.log(p/np.product([0.25]*PWM.shape[1]))
-	return np.log2(p)
+def score_dwm(DWM, kmer):
+    """Score a kmer with a given DWM, and return log2 of the score."""
+    p = DWM[nuc_index[kmer[0]],0]
+    for j,n in enumerate(kmer):
+        if j == 0:
+            continue
+        di = kmer[j-1:j+1]
+        p *= DWM[di_index[di],j]
+    return np.log2(p)
 
 if __name__ == '__main__':
 	tf = sys.argv[1]

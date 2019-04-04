@@ -288,9 +288,7 @@ def score_all(basename, n_process, random_seed, models, sequences):
 
 def score_pwm(PWM, kmer):
     """Score a kmer with a given PWM, and return log2 of the score."""
-    p = np.sum([ PWM[nuc_index[n],j] for j,n in enumerate(kmer)])
-    return p
-    #return np.log(p/np.product([0.25]*PWM.shape[1]))
+    p = np.product([ PWM[nuc_index[n],j] for j,n in enumerate(kmer)])
     return np.log2(p)
 
 def score_dwm(DWM, kmer):
@@ -300,9 +298,7 @@ def score_dwm(DWM, kmer):
         if j == 0:
             continue
         di = kmer[j-1:j+1]
-        p += DWM[di_index[di],j]
-    return p
-    #return np.log(p/np.product([0.25]*PWM.shape[1]))
+        p *= DWM[di_index[di],j]
     return np.log2(p)
 
 def rev_comp(seq):
