@@ -16,9 +16,9 @@ comply with the convention: data/<factor>.K562.<accession>.bed
 import requests, json
 
 def query(url):
-	response = requests.get(url, headers=HEADERS)
-	response_json_dict = response.json()
-	return response_json_dict
+    response = requests.get(url, headers=HEADERS)
+    response_json_dict = response.json()
+    return response_json_dict
 
 def download_file(url, local_filename):
     r = requests.get(url, stream=True)
@@ -27,6 +27,21 @@ def download_file(url, local_filename):
             if chunk:
                 f.write(chunk)
     return local_filename
+
+# Load TF data from table S1 from  
+# https://doi.org/10.1016/j.cell.2018.01.029
+# Use to enforce only using known sequence specific TFs
+f = open('data/S0092867418301065.table_s1.csv')
+f.readline();
+f.readline();
+tfs = {}
+for line in f:
+    fields = line.split(',')
+    if fields[3] == 'Yes':
+        tfs[fields[1]] = 1
+    else:
+        tfs[fields[1]] = 0
+
 
 celltype = "K562"
 
@@ -45,21 +60,27 @@ ids = []
 targets = []
 accessions = []
 for thing in response_json_dict['@graph']:
-	ids.append(thing['@id'])
-	targets.append(thing['target']['label'])
-	accessions.append(thing['accession'])
+    tf = targets.append(thing['target']['label'])
+    TF = tf.split('.')[0]
+    splitTF = TF.split('-')
+    if len(splitTF) > 1:
+        TF = splitTF[1]
+    if TF in tfs:
+        ids.append(thing['@id'])
+        targets.append(tf)
+        accessions.append(thing['accession'])
 
 for i, target in enumerate(targets):
-	response_json_dict = query(base + ids[i])
-	for f in response_json_dict["files"]:
-		if "assembly" in f:
-			if "hg19" in f["assembly"] and "File" in f["@type"]:
-				if "submitted_file_name" not in f: continue
-			  	name = f["submitted_file_name"]
-				if "narrowpeak.gz" in name.lower() and "conservative" in name.lower():
-					href = f["href"]
-					accession = href.split("/")[2]
-					newname = ".".join([target, celltype, accession, "bed", "gz"])
-					download_file(base + href, "data/" + newname)
-					print "\t".join([target, celltype, accession])
-					break
+    response_json_dict = query(base + ids[i])
+    for f in response_json_dict["files"]:
+        if "assembly" in f:
+            if "hg19" in f["assembly"] and "File" in f["@type"]:
+                if "submitted_file_name" not in f: continue
+                name = f["submitted_file_name"]
+                if "narrowpeak.gz" in name.lower() and "conservative" in name.lower():
+                    href = f["href"]
+                    accession = href.split("/")[2]
+                    newname = ".".join([target, celltype, accession, "bed", "gz"])
+                    download_file(base + href, "data/" + newname)
+                    print "\t".join([target, celltype, accession])
+                    break
