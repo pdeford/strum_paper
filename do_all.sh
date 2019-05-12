@@ -23,26 +23,26 @@ touch output/correlations.txt
 # Download necessary data #
 ###########################
 
-## Download reference genome
-#rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
-#tar xvzf data/chromFa.tar.gz -C ./data
-#cat data/chr*.fa > data/hg19.fa
-#rm data/chr*.fa
-#curl "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.chrom.sizes" > data/hg19sizes.genome
-#
-## Download ChIP data for K562 cells
-#python scripts/download_K562chip.py > data/accessions.txt
-#
-#gunzip data/*gz
-#
-## Download FOXA1 binding information from JASPAR
-## Example for figures
-#curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
-#
-## Get TF_class data
-## From http://tfclass.bioinf.med.uni-goettingen.de/about.jsf
-#curl "http://tfclass.bioinf.med.uni-goettingen.de/suppl/tfclass.ttl.gz" > data/tfclass.ttl.gz
-#gunzip data/tfclass.ttl.gz
+# Download reference genome
+rsync -avzP rsync://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz ./data
+tar xvzf data/chromFa.tar.gz -C ./data
+cat data/chr*.fa > data/hg19.fa
+rm data/chr*.fa
+curl "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.chrom.sizes" > data/hg19sizes.genome
+
+# Download ChIP data for K562 cells
+python scripts/download_K562chip.py > data/accessions.txt
+
+gunzip data/*gz
+
+# Download FOXA1 binding information from JASPAR
+# Example for figures
+curl http://jaspar.genereg.net/download/sites/MA0148.1.sites > data/MA0148.1.sites
+
+# Get TF_class data
+# From http://tfclass.bioinf.med.uni-goettingen.de/about.jsf
+curl "http://tfclass.bioinf.med.uni-goettingen.de/suppl/tfclass.ttl.gz" > data/tfclass.ttl.gz
+gunzip data/tfclass.ttl.gz
 
 #############################################################
 # Analyze each ChIP dataset for peak v non peak performance #
