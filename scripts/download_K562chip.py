@@ -60,7 +60,7 @@ ids = []
 targets = []
 accessions = []
 for thing in response_json_dict['@graph']:
-    tf = targets.append(thing['target']['label'])
+    tf = thing['target']['label']
     TF = tf.split('.')[0]
     splitTF = TF.split('-')
     if len(splitTF) > 1:
