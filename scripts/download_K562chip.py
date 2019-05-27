@@ -39,8 +39,6 @@ for line in f:
     fields = line.split(',')
     if fields[3] == 'Yes':
         tfs[fields[1]] = 1
-    else:
-        tfs[fields[1]] = 0
 
 
 celltype = "K562"
